@@ -1,0 +1,19 @@
+name: mdet
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pytorch-gpu==1.10.1
+  - torchvision==0.11.2
+  - cudatoolkit=11.3
+  - pandas
+  - omegaconf
+  - tqdm
+  - opencv
+  - tensorflow
+  - humanfriendly
+  - ca-certificates
+  - certifi
+  - openssl
+  - matplotlib
+  - jsonpickle
