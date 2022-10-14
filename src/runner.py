@@ -4,6 +4,7 @@ import time
 from typing import Union
 
 from omegaconf import OmegaConf
+from src.run_clip import clip
 
 from src.run_megadetector import run_detector
 from src.utils.config import (
@@ -41,21 +42,15 @@ class Runner:
     def exec_mdet(self, config: MDetConfig) -> None:
         input_file_path = config.image_source if config.image_source.is_file() else None
         output_file_path = (
-            config.image_source
-            if config.image_source.is_dir()
-            else config.image_source.parent
+            config.image_source if config.image_source.is_dir() else config.image_source.parent
         ).joinpath("detector_output.json")
         self.logger.info(f"Start {config.image_source} MegaDetector Detection...")
         self.logger.info(f"Output file: {output_file_path}")
         run_detector(detector_config=config)
         self.logger.info("Detection Complete")
-        shutil.copyfile(
-            str(output_file_path), str(self.logdir.joinpath(output_file_path.name))
-        )
+        shutil.copyfile(str(output_file_path), str(self.logdir.joinpath(output_file_path.name)))
         if input_file_path is not None:
-            shutil.copyfile(
-                str(input_file_path), str(self.logdir.joinpath(input_file_path.name))
-            )
+            shutil.copyfile(str(input_file_path), str(self.logdir.joinpath(input_file_path.name)))
 
     def exec_mdet_crop(self, config: MDetCropConfig) -> None:
         pass
@@ -64,7 +59,15 @@ class Runner:
         pass
 
     def exec_clip(self, config: ClipConfig) -> None:
-        pass
+        self.logger.info(f"Start {config.video_dir.name} Clopping...")
+        self.logger.info(f"Save Dir: {config.save_dir}")
+        self.logger.info(
+            f"Frame: {config.start_frame}-{config.end_frame if config.end_frame is not None else 'end'}"
+        )
+        self.logger.info(f"Remove Banner: {config.remove_banner}")
+        with Timer(verbose=True, logger=self.logger, timer_tag="Clip"):
+            clip(config)
+        self.logger.info("Clip Complete!")
 
     def exec_cls(self, config: ClsConfig) -> None:
         pass

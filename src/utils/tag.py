@@ -25,3 +25,14 @@ class SessionTag(BaseTag):
 
 
 session_tag_list = [tag for tag in SessionTag]
+
+
+class ImageSuffix(BaseTag):
+    JPG = "jpg"
+    PNG = "png"
+    BMP = "bmp"
+
+
+class VideoSuffix(BaseTag):
+    MP4 = "mp4"
+    AVI = "avi"

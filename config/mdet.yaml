@@ -5,7 +5,13 @@ output_dir:
 mdet_config:
   model_path: "./models/md_v4.1.0.pb"
   output_absolute_path: False
-  threshold: 0.1
-  ncores: 8
+  threshold: 0.95
   verbose: True
   recursive: True
+
+clip_config:
+  start_frame: 0
+  end_frame:
+  step: 30
+  ext: jpg
+  remove_banner: True
