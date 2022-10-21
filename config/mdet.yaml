@@ -9,6 +9,9 @@ mdet_config:
   verbose: True
   recursive: True
 
+mdet_crop_config:
+  threshold: 0.95
+
 clip_config:
   start_frame: 0
   end_frame:

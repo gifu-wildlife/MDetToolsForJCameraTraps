@@ -29,7 +29,11 @@ class MDetConfig:
 
 @dataclass
 class MDetCropConfig:
-    pass
+    image_source: Path = MISSING
+    mdet_result_path: Path = MISSING
+    output_dir: Path = MISSING
+    threshold: float = 0.95
+    ncores: int = cpu_count()
 
 
 @dataclass
@@ -40,7 +44,7 @@ class MDetRenderConfig:
 @dataclass
 class ClipConfig:
     video_dir: Path = MISSING
-    save_dir: Path = MISSING
+    output_dir: Path = MISSING
     start_frame: int = 0
     end_frame: Optional[int] = None
     step: int = 30
@@ -59,11 +63,16 @@ class RootConfig:
     session_root: Path = MISSING
     image_list_file_path: Optional[str] = None
     output_dir: Optional[Path] = None
+    mdet_result_path: Optional[Path] = None
     log_dir: Path = Path("logs")
     mdet_config: Optional[MDetConfig] = MDetConfig(image_source=II("session_root"))
-    mdet_crop_config: Optional[MDetCropConfig] = MDetCropConfig()
+    mdet_crop_config: Optional[MDetCropConfig] = MDetCropConfig(
+        image_source=II("session_root"),
+        output_dir=II("output_dir"),
+        mdet_result_path=II("mdet_result_path"),
+    )
     mdet_render_config: Optional[MDetRenderConfig] = MDetRenderConfig()
     clip_config: Optional[ClipConfig] = ClipConfig(
-        video_dir=II("session_root"), save_dir=II("output_dir")
+        video_dir=II("session_root"), output_dir=II("output_dir")
     )
     cls_config: Optional[ClsConfig] = ClsConfig()

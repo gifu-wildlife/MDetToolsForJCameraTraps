@@ -6,6 +6,8 @@ import cv2
 from pathlib import Path
 from concurrent import futures
 
+from tqdm import tqdm
+
 from utils.config import ClipConfig
 from utils.tag import ImageSuffix, VideoSuffix
 from utils import glob_multiext
@@ -22,6 +24,7 @@ def save_frame(
     ext: ImageSuffix = ImageSuffix.JPG,
     remove_banner: bool = True,
     banner_size: int = 100,
+    verbose: bool = False,
 ) -> None:
 
     """
@@ -30,6 +33,9 @@ def save_frame(
 
     # check the existance of the video file.
     assert video_path.exists(), "File does not exist: {}".format(video_path)
+    if not save_path.exists():
+        # make output directory to save frames.
+        os.makedirs(save_path, exist_ok=True)
 
     # load the video file.
     cap = cv2.VideoCapture(str(video_path))
@@ -48,7 +54,9 @@ def save_frame(
     if count < end_frame:
         end_frame = count
 
-    logger.info(f"filename: {video_path} - size: ({height},{width}) - count: {count} - fps: {fps}")
+    result_info = f"filename: {video_path} - size: ({height},{width}) - count: {count} - fps: {fps}"
+    if verbose:
+        logger.info(result_info)
 
     digit = len(str(int(count)))
 
@@ -68,6 +76,7 @@ def save_frame(
             # save the frame.
             frame_name = f"{str(i).zfill(digit)}.{ext.value}"
             cv2.imwrite(str(save_path.joinpath(frame_name)), img)
+    return result_info
 
 
 def get_video_path(src_dir: Path, dst_dir: Path) -> list[list[Path]]:
@@ -110,18 +119,12 @@ def get_img_path(img_dirs: list[Path]) -> Union[tuple[list[str], list[str]], lis
 
 def clip(config: Union[ClipConfig, argparse.ArgumentParser]):
     # get video path and save path pairs.
-    src_dst_list = get_video_path(config.video_dir, config.save_dir)
+    src_dst_list = get_video_path(config.video_dir, config.output_dir)
 
-    future_list = []
+    # future_list = []
     with futures.ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        for video_path, save_path in src_dst_list:
-            # print(video_path, save_path)
-
-            # make output directory to save frames.
-            os.makedirs(save_path, exist_ok=True)
-
-            # extract frames from the given video.
-            future = executor.submit(
+        tasks = [
+            executor.submit(
                 save_frame,
                 video_path=video_path,
                 save_path=save_path,
@@ -133,16 +136,34 @@ def clip(config: Union[ClipConfig, argparse.ArgumentParser]):
                 else ImageSuffix.value_of(config.ext),
                 remove_banner=config.remove_banner,
             )
-            future_list.append(future)
-        _ = futures.as_completed(fs=future_list)
+            for video_path, save_path in src_dst_list
+        ]
+        for _ in tqdm(futures.as_completed(tasks), total=len(src_dst_list)):
+            pass
+        # for video_path, save_path in src_dst_list:
+        #     # extract frames from the given video.
+        #     future = executor.submit(
+        #         save_frame,
+        #         video_path=video_path,
+        #         save_path=save_path,
+        #         start_frame=config.start_frame,
+        #         end_frame=config.end_frame,
+        #         step=config.step,
+        #         ext=config.ext
+        #         if isinstance(config.ext, ImageSuffix)
+        #         else ImageSuffix.value_of(config.ext),
+        #         remove_banner=config.remove_banner,
+        #     )
+        #     future_list.append(future)
+        # _ = futures.as_completed(fs=future_list)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Clip frame from video")
 
-    parser.add_argument("--input_dir", type=str, default="data")
-    parser.add_argument("--output_dir", type=str, default="output")
+    parser.add_argument("--video_dir", type=str, default="data")
+    parser.add_argument("--output_dir_path", type=str, default="output")
     parser.add_argument("--start_frame", type=int, default=10)
     parser.add_argument("--end_frame", type=int, default=None)
     parser.add_argument("--step", type=int, default=1)

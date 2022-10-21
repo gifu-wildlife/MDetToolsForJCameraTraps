@@ -6,7 +6,7 @@ from typing import Union
 from omegaconf import OmegaConf
 from src.run_clip import clip
 
-from src.run_megadetector import run_detector
+from src.run_megadetector import run_megadetector
 from src.utils.config import (
     ClipConfig,
     ClsConfig,
@@ -31,8 +31,9 @@ class Runner:
             session_tag if isinstance(session_tag, list) else [session_tag]
         )
 
+        _session_tags_str = "-".join([session_tag.name for session_tag in self.session_tags])
         self.logdir = config.log_dir.joinpath(
-            f'{time.strftime("%Y%m%d%H%M%S")}_{"-".join([session_tag.name for session_tag in self.session_tags])}_{config.session_root.name}'
+            f'{time.strftime("%Y%m%d%H%M%S")}_{_session_tags_str}_{config.session_root.name}'
         )
         os.makedirs(self.logdir, exist_ok=True)
         self.logger = get_logger(out_dir=self.logdir, logname=f"{session_tag}.log")
@@ -46,7 +47,7 @@ class Runner:
         ).joinpath("detector_output.json")
         self.logger.info(f"Start {config.image_source} MegaDetector Detection...")
         self.logger.info(f"Output file: {output_file_path}")
-        run_detector(detector_config=config)
+        run_megadetector(detector_config=config)
         self.logger.info("Detection Complete")
         shutil.copyfile(str(output_file_path), str(self.logdir.joinpath(output_file_path.name)))
         if input_file_path is not None:
@@ -60,10 +61,9 @@ class Runner:
 
     def exec_clip(self, config: ClipConfig) -> None:
         self.logger.info(f"Start {config.video_dir.name} Clopping...")
-        self.logger.info(f"Save Dir: {config.save_dir}")
-        self.logger.info(
-            f"Frame: {config.start_frame}-{config.end_frame if config.end_frame is not None else 'end'}"
-        )
+        self.logger.info(f"Save Dir: {config.output_dir}")
+        _end_frame = config.end_frame if config.end_frame is not None else "end"
+        self.logger.info(f"Frame: {config.start_frame}-{_end_frame}")
         self.logger.info(f"Remove Banner: {config.remove_banner}")
         with Timer(verbose=True, logger=self.logger, timer_tag="Clip"):
             clip(config)

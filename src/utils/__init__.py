@@ -20,7 +20,7 @@ def is_in_list(list_a: list, list_b: list) -> bool:
 def glob_multiext(ext_tags: BaseTag, path: pathlib.Path):
     # ex) .(mp4|avi) -> .mp4 or .avi or .MP4 or .AVI
     pattern = f".({'|'.join([ext.name for ext in ext_tags])})"
-    print(pattern)
+    # print(pattern)
     return sorted(
         [p for p in path.glob("**/*") if re.match(pattern, str(p.suffix), flags=re.IGNORECASE)]
     )
