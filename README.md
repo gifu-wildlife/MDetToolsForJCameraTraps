@@ -2,6 +2,13 @@
 
 カメラトラップ画像/映像向けMegaDetector実行スクリプト．
 
+## GPU Environment Setup
+
+Please refer to [NVIDIA Driver Installation](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_network).  
+```bash
+nvidia-smi  # NVIDIA Driver installation check
+```
+
 ## Requirement
 
 - python=3.9
@@ -20,7 +27,7 @@
 - matplotlib
 - jsonpickle
 
-Environments under [miniforge](https://github.com/conda-forge/miniforge) or [miniconda](https://docs.conda.io/en/latest/miniconda.html)  
+Environments under [miniconda](https://docs.conda.io/en/latest/miniconda.html)  
 環境構築はcondaを用いて行う。  
 
 ### conda installation
@@ -28,13 +35,13 @@ Environments under [miniforge](https://github.com/conda-forge/miniforge) or [min
 
 download installer and run the script.  
 ```bash
-wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
-bash Mambaforge-$(uname)-$(uname -m).sh
+wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh.sh"
+bash Miniconda3-latest-Linux-x86_64.sh.sh
 ```
 
-For more information, please refer to [miniforge official](https://github.com/conda-forge/miniforge) or [miniconda official](https://docs.conda.io/en/latest/miniconda.html)   
+For more information, please refer to [miniconda official](https://docs.conda.io/en/latest/miniconda.html)   
 
-### Run Environment Setup
+### Environment for Script Setup
 
 Project Repository Download
 
@@ -64,4 +71,8 @@ create conda environment.
 
 ```bash
 conda env create -f=environment.yml
+conda activate mdet
 ```
+
+## Usage
+
