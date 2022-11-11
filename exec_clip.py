@@ -16,6 +16,5 @@ schema = OmegaConf.structured(
 # schema = OmegaConf.load("config/mdet.yaml")
 config = OmegaConf.merge(schema, cli_conf)
 
-# runner = Runner(config=config, session_tag=SessionTag.MDet)
 runner = Runner(config=config, session_tag=SessionTag.Clip)
 runner.execute()
