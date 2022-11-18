@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from typing import Any
 
 
@@ -17,11 +17,11 @@ class BaseTag(Enum):
 
 
 class SessionTag(BaseTag):
-    MDet = auto()
-    MDetCrop = auto()
-    MDetRender = auto()
-    Clip = auto()
-    Cls = auto()
+    MDet = "mdet"
+    MDetCrop = "mdetcrop"
+    MDetRender = "mdetrender"
+    Clip = "clip"
+    Cls = "cls"
 
 
 session_tag_list = [tag for tag in SessionTag]

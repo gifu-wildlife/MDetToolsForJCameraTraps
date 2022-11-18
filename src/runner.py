@@ -4,10 +4,10 @@ import time
 from typing import Union
 
 from omegaconf import OmegaConf
-from src.run_clip import clip
+from run_clip import clip
 
-from src.run_megadetector import run_megadetector
-from src.utils.config import (
+from src.run_megadetector import run_mdet_crop, run_megadetector
+from utils.config import (
     ClipConfig,
     ClsConfig,
     MDetConfig,
@@ -15,21 +15,28 @@ from src.utils.config import (
     MDetRenderConfig,
     RootConfig,
 )
-from src.utils.logger import get_logger
-from src.utils.tag import SessionTag, session_tag_list
-from src.utils.timer import Timer
+from utils.logger import get_logger
+from utils.tag import SessionTag, session_tag_list
+from utils.timer import Timer
 
 
 class Runner:
     def __init__(
         self,
         config: RootConfig,
-        session_tag: Union[SessionTag, list[SessionTag]],
+        session_tag: Union[SessionTag, list[SessionTag], str, list[str]],
     ) -> None:
         self.__check_config(config)
-        self.session_tags: list[SessionTag] = (
-            session_tag if isinstance(session_tag, list) else [session_tag]
-        )
+        if isinstance(session_tag, (str, list[str])):
+            self.session_tags: list[SessionTag] = (
+                [SessionTag.value_of(tag) for tag in session_tag]
+                if isinstance(session_tag, list)
+                else [SessionTag.value_of(session_tag)]
+            )
+        else:
+            self.session_tags: list[SessionTag] = (
+                session_tag if isinstance(session_tag, list) else [session_tag]
+            )
 
         _session_tags_str = "-".join([session_tag.name for session_tag in self.session_tags])
         self.logdir = config.log_dir.joinpath(
@@ -54,7 +61,17 @@ class Runner:
             shutil.copyfile(str(input_file_path), str(self.logdir.joinpath(input_file_path.name)))
 
     def exec_mdet_crop(self, config: MDetCropConfig) -> None:
-        pass
+        self.logger.info(f"Start {config.image_source} MegaDetector Cropping...")
+        self.logger.info(f"MDet Output file: {config.mdet_result_path}")
+        self.logger.info(f"Output file: {config.output_dir}")
+        if config.mdet_result_path is None:
+            raise ValueError(
+                f"Invalid Value of mdet_result_path: {config.mdet_result_path}. Please enter."
+            )
+        if config.output_dir is None:
+            raise ValueError(f"Invalid Value of output_dir: {config.output_dir}. Please enter.")
+        run_mdet_crop(config=config)
+        self.logger.info("MDet cropping Complete!")
 
     def exec_mdet_render(self, config: MDetRenderConfig) -> None:
         pass
@@ -104,6 +121,8 @@ class Runner:
         config: RootConfig,
         session_tag: SessionTag,
     ) -> None:
+        self.logger.info(type(session_tag))
+        print(session_tag is SessionTag.MDet)
         if session_tag == SessionTag.MDet:
             if config.mdet_config is not None:
                 self.exec_mdet(config=config.mdet_config)

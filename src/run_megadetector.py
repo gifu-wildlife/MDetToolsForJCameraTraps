@@ -5,17 +5,19 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
+# import pandas as pd
 from tqdm import tqdm
 
 from megadetector.data_management.annotations.annotation_constants import (
     detector_bbox_category_id_to_name,
 )
-from megadetector.detection.run_detector import ImagePathUtils
+
+# from megadetector.detection.run_detector import ImagePathUtils
 from megadetector.detection.run_detector_batch import (
     load_and_run_detector_batch,
     write_results_to_file,
 )
+from utils import image_pathlist_load_from_file
 from utils.config import MDetConfig, MDetCropConfig
 from utils.timer import Timer
 from megadetector.visualization import visualization_utils as vis_utils
@@ -23,7 +25,7 @@ from megadetector.visualization import visualization_utils as vis_utils
 
 DEFAULT_DETECTOR_LABEL_MAP = {str(k): v for k, v in detector_bbox_category_id_to_name.items()}
 
-logger = getLogger("root")
+logger = getLogger(__file__)
 
 
 def run_megadetector(
@@ -45,33 +47,35 @@ def run_megadetector(
             image_source.is_dir()
         ), "image_file must be a directory when megadetector.output_absolute_path is not True"
 
-    if image_source.is_dir():
-        image_file_names = ImagePathUtils.find_images(str(image_source), detector_config.recursive)
-        image_file_names = [
-            image_file_name
-            for image_file_name in image_file_names
-            if not os.path.join(image_source, "exept_dif") in image_file_name
-        ]
-        logger.info("{} image files found in the input directory".format(len(image_file_names)))
-    # A json list of image paths
-    elif image_source.is_file() and image_source.suffix == ".json":
-        with open(image_source) as f:
-            image_file_names = json.load(f)
-        logger.info("{} image files found in the json list".format(len(image_file_names)))
-    elif image_source.is_file() and image_source.suffix == ".csv":
-        df = pd.read_csv(str(image_source), header=0)
-        image_file_names = df["fullpath"].to_list()
-        logger.info("{} image files found in the csv list".format(len(image_file_names)))
-    # A single image file
-    elif image_source.is_file and ImagePathUtils.is_image_file(str(image_source)):
-        image_file_names = [image_source]
-        logger.info("A single image at {} is the input file".format(image_source))
-        # photo_data_dir = image_source.parent
-    else:
-        raise ValueError(
-            "image_source specified is not a directory, a json list, or an image file, "
-            "(or does not have recognizable extensions)."
-        )
+    # if image_source.is_dir():
+    #     image_file_names = ImagePathUtils.find_images(str(image_source),
+    #                                                   detector_config.recursive)
+    #     image_file_names = [
+    #         image_file_name
+    #         for image_file_name in image_file_names
+    #         if not os.path.join(image_source, "exept_dif") in image_file_name
+    #     ]
+    #     logger.info("{} image files found in the input directory".format(len(image_file_names)))
+    # # A json list of image paths
+    # elif image_source.is_file() and image_source.suffix == ".json":
+    #     with open(image_source) as f:
+    #         image_file_names = json.load(f)
+    #     logger.info("{} image files found in the json list".format(len(image_file_names)))
+    # elif image_source.is_file() and image_source.suffix == ".csv":
+    #     df = pd.read_csv(str(image_source), header=0)
+    #     image_file_names = df["fullpath"].to_list()
+    #     logger.info("{} image files found in the csv list".format(len(image_file_names)))
+    # # A single image file
+    # elif image_source.is_file and ImagePathUtils.is_image_file(str(image_source)):
+    #     image_file_names = [image_source]
+    #     logger.info("A single image at {} is the input file".format(image_source))
+    #     # photo_data_dir = image_source.parent
+    # else:
+    #     raise ValueError(
+    #         "image_source specified is not a directory, a json list, or an image file, "
+    #         "(or does not have recognizable extensions)."
+    #     )
+    image_file_names = image_pathlist_load_from_file(image_source, detector_config.recursive)
 
     assert len(image_file_names) > 0, "Specified image_source does not point to valid image files"
     assert os.path.exists(
@@ -134,36 +138,6 @@ def run_mdet_crop(config: MDetCropConfig):
     num_saved = 0
     croped_img_paths = []
 
-    def crop(entry: dict[Any], output_dir: Path, image_dir: Path, threshold: float):
-        image_id = entry["file"]
-        if entry["max_detection_conf"] < threshold:
-            return 0, None
-        if "failure" in entry:
-            logger.info(f'Skipping {image_id}, failure: "{entry["failure"]}"')
-            return 0, None
-        if Path(image_id).is_absolute():
-            image_obj = Path(image_id)
-        else:
-            image_obj = image_dir.joinpath(image_id)
-
-        if not image_obj.exists():
-            logger.info(f"Image {image_id} not found in images_dir; skipped.")
-            return 0, None
-
-        image = vis_utils.open_image(image_obj)
-        images_cropped = vis_utils.crop_image(
-            entry["detections"], image, confidence_threshold=threshold
-        )
-        image_parts = [parts for parts in list(image_obj.parts) if parts not in image_dir.parts]
-        save_dir = output_dir.joinpath("/".join(image_parts[:-1]))
-        if not save_dir.exists():
-            os.makedirs(save_dir, exist_ok=True)
-        for i_crop, cropped_image in enumerate(images_cropped):
-            img_name, ext = Path(image_id).stem, Path(image_id).suffix
-            crop_img_path = save_dir.joinpath(f"{img_name}---{i_crop}{ext}")
-            cropped_image.save(crop_img_path)
-        return 1, crop_img_path
-
     with futures.ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         tasks = [
             executor.submit(
@@ -175,7 +149,8 @@ def run_mdet_crop(config: MDetCropConfig):
             )
             for entry in images
         ]
-        for crop_flag, croped_img_path in tqdm(futures.as_completed(tasks), total=len(images)):
+        for future in tqdm(futures.as_completed(tasks), total=len(images)):
+            crop_flag, croped_img_path = future.result()
             num_saved += crop_flag
             if croped_img_path is None:
                 pass
@@ -185,3 +160,34 @@ def run_mdet_crop(config: MDetCropConfig):
         f"Cropping detection results on {num_saved} images, " f"saved to {config.output_dir}."
     )
     return croped_img_paths
+
+
+def crop(entry: dict[Any], output_dir: Path, image_dir: Path, threshold: float):
+    image_id = entry["file"]
+    if entry["max_detection_conf"] < threshold:
+        return 0, None
+    if "failure" in entry:
+        logger.info(f'Skipping {image_id}, failure: "{entry["failure"]}"')
+        return 0, None
+    if Path(image_id).is_absolute():
+        image_obj = Path(image_id)
+    else:
+        image_obj = image_dir.joinpath(image_id)
+
+    if not image_obj.exists():
+        logger.info(f"Image {image_id} not found in images_dir; skipped.")
+        return 0, None
+
+    image = vis_utils.open_image(image_obj)
+    images_cropped = vis_utils.crop_image(
+        entry["detections"], image, confidence_threshold=threshold
+    )
+    image_parts = [parts for parts in list(image_obj.parts) if parts not in image_dir.parts]
+    save_dir = output_dir.joinpath("/".join(image_parts[:-1]))
+    if not save_dir.exists():
+        os.makedirs(save_dir, exist_ok=True)
+    for i_crop, cropped_image in enumerate(images_cropped):
+        img_name, ext = Path(image_id).stem, Path(image_id).suffix
+        crop_img_path = save_dir.joinpath(f"{img_name}---{i_crop}{ext}")
+        cropped_image.save(crop_img_path)
+    return 1, crop_img_path
