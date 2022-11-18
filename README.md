@@ -5,7 +5,7 @@
 ## GPU Environment Setup
 
 Please refer to [NVIDIA Driver Version Check](https://www.nvidia.com/Download/index.aspx?lang=en-us).  
-and Install nvidia-driver
+and Install nvidia-driver.
 ```
 sudo apt install nvidia-driver-***
 ```
