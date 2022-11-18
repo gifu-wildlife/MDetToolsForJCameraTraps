@@ -4,7 +4,14 @@
 
 ## GPU Environment Setup
 
-Please refer to [NVIDIA Driver Installation](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_network).  
+Please refer to [NVIDIA Driver Version Check](https://www.nvidia.com/Download/index.aspx?lang=en-us).  
+and Install nvidia-driver
+```
+sudo apt install nvidia-driver-***
+```
+*** is a placeholder. Please enter the recommended nvidia driver version.  
+
+check installation.
 ```bash
 nvidia-smi  # NVIDIA Driver installation check
 ```
@@ -35,7 +42,7 @@ Environments under [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 download installer and run the script.  
 ```bash
-wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh.sh"
+wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 bash Miniconda3-latest-Linux-x86_64.sh.sh
 ```
 
