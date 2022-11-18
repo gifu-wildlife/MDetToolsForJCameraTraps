@@ -2,7 +2,8 @@ from omegaconf import OmegaConf
 
 from src.runner import Runner
 from src.utils.config import RootConfig
-from src.utils.tag import SessionTag
+
+# from src.utils.tag import SessionTag
 
 cli = OmegaConf.from_cli()  # command line interface config
 if cli.get("config_path"):
@@ -16,5 +17,5 @@ schema = OmegaConf.structured(
 # schema = OmegaConf.load("config/mdet.yaml")
 config = OmegaConf.merge(schema, cli_conf)
 
-runner = Runner(config=config, session_tag=SessionTag.MDet)
+runner = Runner(config=config, session_tag="mdet")
 runner.execute()
