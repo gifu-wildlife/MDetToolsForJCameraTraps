@@ -43,7 +43,9 @@ Environments under [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 download installer and run the script.  
 ```bash
 wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-bash Miniconda3-latest-Linux-x86_64.sh.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+# If you are using miniconda for the first time, Please ansew "yes" to "Do you wish the installer to initialize Miniconda3 by running conda init?" 
+source ~./.bashrc
 ```
 
 For more information, please refer to [miniconda official](https://docs.conda.io/en/latest/miniconda.html)   
