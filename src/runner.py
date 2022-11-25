@@ -5,6 +5,7 @@ from typing import Union
 
 from omegaconf import OmegaConf
 from run_clip import clip
+from src.run_cls import classifire_predict
 
 from src.run_megadetector import run_mdet_crop, run_megadetector
 from utils.config import (
@@ -87,7 +88,10 @@ class Runner:
         self.logger.info("Clip Complete!")
 
     def exec_cls(self, config: ClsConfig) -> None:
-        pass
+        self.logger.info(f"Start {config.image_source} Classifire Prediction...")
+        classifire_predict(cls_config=config)
+        self.logger.info(f"Result file: {str(config.result_file_name)}")
+        self.logger.info("Prediction Complete!")
 
     def __check_config(self, config: RootConfig) -> None:
         assert (
@@ -121,8 +125,7 @@ class Runner:
         config: RootConfig,
         session_tag: SessionTag,
     ) -> None:
-        self.logger.info(type(session_tag))
-        print(session_tag is SessionTag.MDet)
+        self.logger.info(session_tag)
         if session_tag == SessionTag.MDet:
             if config.mdet_config is not None:
                 self.exec_mdet(config=config.mdet_config)

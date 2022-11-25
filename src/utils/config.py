@@ -18,8 +18,8 @@ def cpu_count() -> int:
 
 @dataclass
 class MDetConfig:
-    model_path: Path = Path("models/md_v5a.0.0.pt")
     image_source: Path = MISSING
+    model_path: Path = Path("models/md_v5a.0.0.pt")
     threshold: float = 0.95
     output_absolute_path: bool = True
     ncores: int = cpu_count()
@@ -42,6 +42,17 @@ class MDetRenderConfig:
 
 
 @dataclass
+class ClsConfig:
+    image_source: Path = MISSING
+    model_path: Path = Path("models/classifire/15cat_50epoch_resnet50.pth")
+    category_list_path: Path = Path("models/classifire/category.txt")
+    result_file_name: str = "classifire_prediction_result.csv"
+    architecture: str = "resnet50"
+    num_classes: int = -1
+    use_gpu: bool = True
+
+
+@dataclass
 class ClipConfig:
     video_dir: Path = MISSING
     output_dir: Path = MISSING
@@ -50,11 +61,6 @@ class ClipConfig:
     step: int = 30
     ext: Union[ImageSuffix, str] = ImageSuffix.JPG
     remove_banner: bool = True
-
-
-@dataclass
-class ClsConfig:
-    pass
 
 
 @dataclass
@@ -75,4 +81,4 @@ class RootConfig:
     clip_config: Optional[ClipConfig] = ClipConfig(
         video_dir=II("session_root"), output_dir=II("output_dir")
     )
-    cls_config: Optional[ClsConfig] = ClsConfig()
+    cls_config: Optional[ClsConfig] = ClsConfig(image_source=II("session_root"))

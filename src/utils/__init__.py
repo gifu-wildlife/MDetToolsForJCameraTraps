@@ -1,10 +1,13 @@
 import json
 import os
+import random
 import re
 from pathlib import Path
 from logging import getLogger
+import numpy as np
 
 import pandas as pd
+import torch
 
 # import sys
 # utils = Path(__file__).parent
@@ -76,3 +79,12 @@ def glob_multiext(ext_tags: BaseTag, path: Path):
     return sorted(
         [p for p in path.glob("**/*") if re.match(pattern, str(p.suffix), flags=re.IGNORECASE)]
     )
+
+
+def seed_everything(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.use_deterministic_algorithms = True

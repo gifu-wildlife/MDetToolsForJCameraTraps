@@ -28,20 +28,6 @@ class PredictionDetectorDataset(torch.utils.data.Dataset):
             self.data_paths = sorted(
                 list(data_source.glob("**/*.png")) + list(data_source.glob("**/*.jpg"))
             )
-        # elif data_source.is_file and data_source.suffix == ".json":
-        #     # print("json")
-        #     with open(data_source) as f:
-        #         detector_output = json.load(f)
-        #         assert (
-        #             "images" in detector_output
-        #         ), 'Detector output file should be a json with an "images" field.'
-        #     _ = detector_output["images"]
-        # elif data_source.is_file and data_source.suffix == ".csv":
-        #     # print("csv")
-        #     df = pd.read_csv(str(data_source))
-        #     self.data_paths = df["fullpath"].values
-        # else:
-        #     raise ValueError(f"Invalid value of data_source: {data_source}")
         self.data_paths = image_pathlist_load_from_file(data_source, recursivce=True, exchange=True)
 
         if transform is None:
