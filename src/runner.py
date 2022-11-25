@@ -4,21 +4,37 @@ import time
 from typing import Union
 
 from omegaconf import OmegaConf
-from run_clip import clip
-from src.run_cls import classifire_predict
 
-from src.run_megadetector import run_mdet_crop, run_megadetector
-from utils.config import (
-    ClipConfig,
-    ClsConfig,
-    MDetConfig,
-    MDetCropConfig,
-    MDetRenderConfig,
-    RootConfig,
-)
-from utils.logger import get_logger
-from utils.tag import SessionTag, session_tag_list
-from utils.timer import Timer
+try:
+    from src.run_clip import clip
+    from src.run_cls import classifire_predict
+    from src.run_megadetector import run_mdet_crop, run_megadetector
+    from src.utils.config import (
+        ClipConfig,
+        ClsConfig,
+        MDetConfig,
+        MDetCropConfig,
+        MDetRenderConfig,
+        RootConfig,
+    )
+    from src.utils.logger import get_logger
+    from src.utils.tag import SessionTag, session_tag_list
+    from src.utils.timer import Timer
+except ImportError:
+    from run_clip import clip
+    from run_cls import classifire_predict
+    from run_megadetector import run_mdet_crop, run_megadetector
+    from utils.config import (
+        ClipConfig,
+        ClsConfig,
+        MDetConfig,
+        MDetCropConfig,
+        MDetRenderConfig,
+        RootConfig,
+    )
+    from utils.logger import get_logger
+    from utils.tag import SessionTag, session_tag_list
+    from utils.timer import Timer
 
 
 class Runner:
@@ -28,7 +44,7 @@ class Runner:
         session_tag: Union[SessionTag, list[SessionTag], str, list[str]],
     ) -> None:
         self.__check_config(config)
-        if isinstance(session_tag, (str, list[str])):
+        if isinstance(session_tag, (str, list)):
             self.session_tags: list[SessionTag] = (
                 [SessionTag.value_of(tag) for tag in session_tag]
                 if isinstance(session_tag, list)
