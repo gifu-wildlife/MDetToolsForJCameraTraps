@@ -4,6 +4,9 @@ import time
 from typing import Union
 
 from omegaconf import OmegaConf
+from src.run_summary import img_cls_summary
+
+from src.utils.config import SummaryConfig
 
 try:
     from src.run_clip import clip
@@ -104,10 +107,33 @@ class Runner:
         self.logger.info("Clip Complete!")
 
     def exec_cls(self, config: ClsConfig) -> None:
+        input_file_path = config.image_source if config.image_source.is_file() else None
         self.logger.info(f"Start {config.image_source} Classifire Prediction...")
         classifire_predict(cls_config=config)
-        self.logger.info(f"Result file: {str(config.result_file_name)}")
+        self.logger.info(f"Result file: {config.result_file_name}")
+        if input_file_path is not None:
+            shutil.copyfile(
+                str(input_file_path.parent.joinpath(config.result_file_name)),
+                str(self.logdir.joinpath(config.result_file_name)),
+            )
+            shutil.copyfile(str(input_file_path), str(self.logdir.joinpath(input_file_path.name)))
+        else:
+            shutil.copyfile(
+                str(config.image_source.joinpath(config.result_file_name)),
+                str(self.logdir.joinpath(config.result_file_name)),
+            )
         self.logger.info("Prediction Complete!")
+
+    def exec_img_summary(self, config: SummaryConfig):
+        self.logger.info(f"Start {config.cls_result_dir} Classifire Summarize...")
+        self.logger.info(f"Summarized file: {config.img_summary_name}")
+        img_cls_summary(config=config, summary_name=config.img_summary_name)
+        self.logger.info(f"Result file: {config.cls_result_dir.joinpath(config.img_summary_name)}")
+        shutil.copyfile(
+            str(config.cls_result_dir.joinpath(config.img_summary_name)),
+            str(self.logdir.joinpath(config.img_summary_name)),
+        )
+        self.logger.info("IMG wise Summary Complete!")
 
     def __check_config(self, config: RootConfig) -> None:
         assert (
@@ -157,6 +183,9 @@ class Runner:
         elif session_tag == SessionTag.Cls:
             if config.cls_config is not None:
                 self.exec_cls(config=config.cls_config)
+        elif session_tag == SessionTag.ImgSummary:
+            if config.summary_config is not None:
+                self.exec_img_summary(config=config.summary_config)
 
     def execute(self) -> None:
         exec_list = {k: False for k in session_tag_list}

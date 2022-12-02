@@ -53,6 +53,14 @@ class ClsConfig:
 
 
 @dataclass
+class SummaryConfig:
+    cls_result_dir: Path = MISSING
+    cls_result_file_name: str = "classifire_prediction_result.csv"
+    img_summary_name: str = "img_wise_cls_summary.csv"
+    # cls_result_csv: Optional[Path] = MISSING
+
+
+@dataclass
 class ClipConfig:
     video_dir: Path = MISSING
     output_dir: Path = MISSING
@@ -67,7 +75,7 @@ class ClipConfig:
 class RootConfig:
     config_path: Optional[Path] = None
     session_root: Path = MISSING
-    image_list_file_path: Optional[str] = None
+    image_list_file_path: Optional[Path] = None
     output_dir: Optional[Path] = None
     mdet_result_path: Optional[Path] = None
     log_dir: Path = Path("logs")
@@ -82,3 +90,4 @@ class RootConfig:
         video_dir=II("session_root"), output_dir=II("output_dir")
     )
     cls_config: Optional[ClsConfig] = ClsConfig(image_source=II("session_root"))
+    summary_config: Optional[SummaryConfig] = SummaryConfig(cls_result_dir=II("session_root"))

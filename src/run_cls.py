@@ -84,5 +84,5 @@ def classifire_predict(cls_config: ClsConfig):
         else cls_config.image_source.parent
     )
     result_path = data_dir.joinpath(cls_config.result_file_name)
-    df.to_csv(result_path)
+    df.sort_values("filepath").to_csv(result_path, index=None)
     return result_path

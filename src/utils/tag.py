@@ -22,6 +22,7 @@ class SessionTag(BaseTag):
     MDetRender = "mdetrender"
     Clip = "clip"
     Cls = "cls"
+    ImgSummary = "imgsummary"
 
 
 session_tag_list = [tag for tag in SessionTag]

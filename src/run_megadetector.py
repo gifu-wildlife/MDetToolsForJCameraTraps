@@ -4,6 +4,7 @@ import os
 from logging import getLogger
 from pathlib import Path
 from typing import Any
+import pandas as pd
 
 # import pandas as pd
 from tqdm import tqdm
@@ -159,6 +160,13 @@ def run_mdet_crop(config: MDetCropConfig):
     logger.info(
         f"Cropping detection results on {num_saved} images, " f"saved to {config.output_dir}."
     )
+    src_filepaths = [
+        config.mdet_result_path.parent.joinpath(entry["file"]).absolute() for entry in images
+    ]
+    pd.DataFrame(
+        [src_filepaths, [None] * len(src_filepaths), [None] * len(src_filepaths)],
+        index=["filepath", "substance", "n_bbox"],
+    ).T.to_csv(config.output_dir.joinpath("img_wise_cls_summary.csv"), index=None)
     return croped_img_paths
 
 
