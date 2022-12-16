@@ -54,9 +54,7 @@ def img_cls_summary(
         if len(categories) == 1:
             substance = categories[0]
         elif len(categories) > 1:
-            substance = "_".join(
-                sorted(cls_df[cls_df["src_filepath"] == src_filepath]["category"].tolist())
-            )
+            substance = "_".join(categories)
         else:
             substance = "N/A"
         substance_list.append(substance)
