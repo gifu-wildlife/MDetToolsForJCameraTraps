@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 import pandas as pd
 
 try:
@@ -20,15 +21,22 @@ def img_cls_summary(
     # result_file_path = (
     #     "_test_dataset/R3_Kinkazan_REST_Boar_Samples-crop/classifire_prediction_result.csv"
     # )
-    cls_df = pd.read_csv(result_file_path, header=0).sort_values("filepath").reset_index()
-    img_summary_df = pd.read_csv(summary_file_path, header=0).sort_values("filepath").reset_index()
+    cls_df = pd.read_csv(result_file_path, header=0).sort_values("filepath").reset_index(drop=True)
+    img_summary_df = (
+        pd.read_csv(summary_file_path, header=0).sort_values("filepath").reset_index(drop=True)
+    )
+    session_root = Path(img_summary_df["filepath"][0]).parent.parent
+    # print(session_root)
 
     crop_ids = []
     src_filepaths = []
     for filepath in cls_df["filepath"].values:
         src_filename, crop_id = Path(filepath).stem.split(split_symbol)
         ext = Path(filepath).suffix
-        src_filepaths.append(Path(filepath).parent.joinpath(src_filename + ext))
+        # src_filepaths.append(Path(filepath).parent.joinpath(src_filename + ext))
+        src_filepaths.append(
+            session_root.joinpath(Path(filepath).parent.name).joinpath(src_filename + ext)
+        )
         crop_ids.append(crop_id)
     cls_df["src_filepath"] = src_filepaths
     cls_df["crop_id"] = crop_ids
@@ -55,15 +63,40 @@ def img_cls_summary(
         num_of_bbox_list.append(num_of_bbox)
 
     img_summary_update_df = pd.DataFrame(
-        [sorted(list(set(src_filepaths))), substance_list, num_of_bbox_list],
+        [sorted(list(set(map(str, src_filepaths)))), substance_list, num_of_bbox_list],
         index=["filepath", "substance", "n_bbox"],
     ).T
 
-    for i in range(len(img_summary_df)):
-        img_summary_df["substance"].iloc[0] = img_summary_update_df[
-            img_summary_update_df["filepath"] == img_summary_df["filepath"]
-        ]
+    # print(img_summary_update_df["filepath"].values.tolist()[0])
+    # print(img_summary_df["filepath"].values.tolist()[0])
+    # print(
+    #     list(set(img_summary_update_df["filepath"].values.tolist())
+    #     & set(img_summary_df["filepath"].values.tolist()))
+    # )
+
+    non_NA_filepath_list = list(
+        set(img_summary_update_df["filepath"].values.tolist())
+        & set(img_summary_df["filepath"].values.tolist())
+    )
+    non_NA_bool_list = np.array(
+        [filepath in non_NA_filepath_list for filepath in img_summary_df["filepath"].values]
+    )
+    # print(non_NA_bool_list)
+    # print(
+    #     len(img_summary_df),
+    #     len(img_summary_df.loc[non_NA_bool_list, :]),
+    #     len(img_summary_update_df),
+    # )
+    img_summary_df.loc[non_NA_bool_list, ["substance", "n_bbox"]] = img_summary_update_df.loc[
+        :, ["substance", "n_bbox"]
+    ]
+
+    # for i in range(len(img_summary_df)):
+    #     pass
+    # img_summary_df["substance"].iloc[:, 0] = img_summary_update_df[
+    #     img_summary_update_df["filepath"] == img_summary_df["filepath"]
+    # ]
     # img_summary_df = img_summary_df.set_index("filepath", inplace=False)
     # img_summary_df.update(img_summary_update_df)
-    img_summary_df.reset_index().to_csv(root.joinpath(summary_name), index=None)
+    img_summary_df.reset_index(drop=True).to_csv(root.joinpath(summary_name), index=None)
     # print(result_df)
