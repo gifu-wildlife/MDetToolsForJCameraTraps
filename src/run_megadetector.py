@@ -1,14 +1,11 @@
-from concurrent import futures
 import json
 import os
+from concurrent import futures
 from logging import getLogger
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
+
 import pandas as pd
-
-# import pandas as pd
-from tqdm import tqdm
-
 from megadetector.data_management.annotations.annotation_constants import (
     detector_bbox_category_id_to_name,
 )
@@ -18,13 +15,17 @@ from megadetector.detection.run_detector_batch import (
     load_and_run_detector_batch,
     write_results_to_file,
 )
+from megadetector.visualization import visualization_utils as vis_utils
+
+# import pandas as pd
+from tqdm import tqdm
 from utils import image_pathlist_load_from_file
 from utils.config import MDetConfig, MDetCropConfig
 from utils.timer import Timer
-from megadetector.visualization import visualization_utils as vis_utils
 
-
-DEFAULT_DETECTOR_LABEL_MAP = {str(k): v for k, v in detector_bbox_category_id_to_name.items()}
+DEFAULT_DETECTOR_LABEL_MAP = {
+    str(k): v for k, v in detector_bbox_category_id_to_name.items()
+}
 
 logger = getLogger(__file__)
 
@@ -42,7 +43,9 @@ def run_megadetector(
     assert (
         0.0 < detector_config.threshold <= 1.0
     ), "Confidence threshold needs to be between 0 and 1"  # Python chained comparison
-    assert output_json_name.endswith(".json"), "output_file specified needs to end with .json"
+    assert output_json_name.endswith(
+        ".json"
+    ), "output_file specified needs to end with .json"
     if not detector_config.output_absolute_path:
         assert (
             image_source.is_dir()
@@ -76,9 +79,13 @@ def run_megadetector(
     #         "image_source specified is not a directory, a json list, or an image file, "
     #         "(or does not have recognizable extensions)."
     #     )
-    image_file_names = image_pathlist_load_from_file(image_source, detector_config.recursive)
+    image_file_names = image_pathlist_load_from_file(
+        image_source, detector_config.recursive
+    )
 
-    assert len(image_file_names) > 0, "Specified image_source does not point to valid image files"
+    assert (
+        len(image_file_names) > 0
+    ), "Specified image_source does not point to valid image files"
     assert os.path.exists(
         image_file_names[0]
     ), f"The first image to be scored does not exist at {image_file_names[0]}"
@@ -112,7 +119,7 @@ def run_megadetector(
     )
 
 
-def run_mdet_crop(config: MDetCropConfig):
+def run_mdet_crop(config: MDetCropConfig) -> list[Path]:
     assert config.mdet_result_path is not None, (
         "Please enter the mdet_result_path, "
         "ex) python run_mdet_crop.py session_root=*** "
@@ -134,7 +141,9 @@ def run_mdet_crop(config: MDetCropConfig):
     num_images = len(images)
     logger.info(f"Detector output file contains {num_images} entries.")
     logger.info(
-        "Cropping detections above a confidence threshold of {}...".format(config.threshold)
+        "Cropping detections above a confidence threshold of {}...".format(
+            config.threshold
+        )
     )
     num_saved = 0
     croped_img_paths = []
@@ -158,10 +167,12 @@ def run_mdet_crop(config: MDetCropConfig):
             else:
                 croped_img_paths.append(croped_img_path)
     logger.info(
-        f"Cropping detection results on {num_saved} images, " f"saved to {config.output_dir}."
+        f"Cropping detection results on {num_saved} images, "
+        f"saved to {config.output_dir}."
     )
     src_filepaths = [
-        config.mdet_result_path.parent.joinpath(entry["file"]).absolute() for entry in images
+        config.mdet_result_path.parent.joinpath(entry["file"]).absolute()
+        for entry in images
     ]
     pd.DataFrame(
         [src_filepaths, [None] * len(src_filepaths), [None] * len(src_filepaths)],
@@ -170,7 +181,9 @@ def run_mdet_crop(config: MDetCropConfig):
     return croped_img_paths
 
 
-def crop(entry: dict[Any], output_dir: Path, image_dir: Path, threshold: float):
+def crop(
+    entry: dict[Any], output_dir: Path, image_dir: Path, threshold: float
+) -> tuple[int, Optional[Path]]:
     image_id = entry["file"]
     if entry["max_detection_conf"] < threshold:
         return 0, None
@@ -190,7 +203,9 @@ def crop(entry: dict[Any], output_dir: Path, image_dir: Path, threshold: float):
     images_cropped = vis_utils.crop_image(
         entry["detections"], image, confidence_threshold=threshold
     )
-    image_parts = [parts for parts in list(image_obj.parts) if parts not in image_dir.parts]
+    image_parts = [
+        parts for parts in list(image_obj.parts) if parts not in image_dir.parts
+    ]
     save_dir = output_dir.joinpath("/".join(image_parts[:-1]))
     if not save_dir.exists():
         os.makedirs(save_dir, exist_ok=True)

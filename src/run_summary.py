@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -21,9 +22,15 @@ def img_cls_summary(
     # result_file_path = (
     #     "_test_dataset/R3_Kinkazan_REST_Boar_Samples-crop/classifire_prediction_result.csv"
     # )
-    cls_df = pd.read_csv(result_file_path, header=0).sort_values("filepath").reset_index(drop=True)
+    cls_df = (
+        pd.read_csv(result_file_path, header=0)
+        .sort_values("filepath")
+        .reset_index(drop=True)
+    )
     img_summary_df = (
-        pd.read_csv(summary_file_path, header=0).sort_values("filepath").reset_index(drop=True)
+        pd.read_csv(summary_file_path, header=0)
+        .sort_values("filepath")
+        .reset_index(drop=True)
     )
     session_root = Path(img_summary_df["filepath"][0]).parent.parent
     # print(session_root)
@@ -35,7 +42,9 @@ def img_cls_summary(
         ext = Path(filepath).suffix
         # src_filepaths.append(Path(filepath).parent.joinpath(src_filename + ext))
         src_filepaths.append(
-            session_root.joinpath(Path(filepath).parent.name).joinpath(src_filename + ext)
+            session_root.joinpath(Path(filepath).parent.name).joinpath(
+                src_filename + ext
+            )
         )
         crop_ids.append(crop_id)
     cls_df["src_filepath"] = src_filepaths
@@ -49,7 +58,9 @@ def img_cls_summary(
     for src_filepath in sorted(list(set(src_filepaths))):
         num_of_bbox = n_bbox[src_filepath]
         categories = sorted(
-            list(set(cls_df[cls_df["src_filepath"] == src_filepath]["category"].tolist()))
+            list(
+                set(cls_df[cls_df["src_filepath"] == src_filepath]["category"].tolist())
+            )
         )
         if len(categories) == 1:
             substance = categories[0]
@@ -77,7 +88,10 @@ def img_cls_summary(
         & set(img_summary_df["filepath"].values.tolist())
     )
     non_NA_bool_list = np.array(
-        [filepath in non_NA_filepath_list for filepath in img_summary_df["filepath"].values]
+        [
+            filepath in non_NA_filepath_list
+            for filepath in img_summary_df["filepath"].values
+        ]
     )
     # print(non_NA_bool_list)
     # print(
@@ -85,9 +99,9 @@ def img_cls_summary(
     #     len(img_summary_df.loc[non_NA_bool_list, :]),
     #     len(img_summary_update_df),
     # )
-    img_summary_df.loc[non_NA_bool_list, ["substance", "n_bbox"]] = img_summary_update_df.loc[
-        :, ["substance", "n_bbox"]
-    ]
+    img_summary_df.loc[
+        non_NA_bool_list, ["substance", "n_bbox"]
+    ] = img_summary_update_df.loc[:, ["substance", "n_bbox"]]
 
     # for i in range(len(img_summary_df)):
     #     pass
@@ -96,5 +110,7 @@ def img_cls_summary(
     # ]
     # img_summary_df = img_summary_df.set_index("filepath", inplace=False)
     # img_summary_df.update(img_summary_update_df)
-    img_summary_df.reset_index(drop=True).to_csv(root.joinpath(summary_name), index=None)
+    img_summary_df.reset_index(drop=True).to_csv(
+        root.joinpath(summary_name), index=None
+    )
     # print(result_df)

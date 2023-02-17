@@ -1,16 +1,15 @@
-from logging import getLogger
-from typing import Union
-import os
 import argparse
-import cv2
-from pathlib import Path
+import os
 from concurrent import futures
+from logging import getLogger
+from pathlib import Path
+from typing import Union
 
+import cv2
 from tqdm import tqdm
-
+from utils import glob_multiext
 from utils.config import ClipConfig
 from utils.tag import ImageSuffix, VideoSuffix
-from utils import glob_multiext
 
 logger = getLogger("root")
 

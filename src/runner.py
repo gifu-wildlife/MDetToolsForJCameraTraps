@@ -5,7 +5,6 @@ from typing import Union
 
 from omegaconf import OmegaConf
 from src.run_summary import img_cls_summary
-
 from src.utils.config import SummaryConfig
 
 try:
@@ -58,7 +57,9 @@ class Runner:
                 session_tag if isinstance(session_tag, list) else [session_tag]
             )
 
-        _session_tags_str = "-".join([session_tag.name for session_tag in self.session_tags])
+        _session_tags_str = "-".join(
+            [session_tag.name for session_tag in self.session_tags]
+        )
         self.logdir = config.log_dir.joinpath(
             f'{time.strftime("%Y%m%d%H%M%S")}_{_session_tags_str}_{config.session_root.name}'
         )
@@ -70,15 +71,21 @@ class Runner:
     def exec_mdet(self, config: MDetConfig) -> None:
         input_file_path = config.image_source if config.image_source.is_file() else None
         output_file_path = (
-            config.image_source if config.image_source.is_dir() else config.image_source.parent
+            config.image_source
+            if config.image_source.is_dir()
+            else config.image_source.parent
         ).joinpath("detector_output.json")
         self.logger.info(f"Start {config.image_source} MegaDetector Detection...")
         self.logger.info(f"Output file: {output_file_path}")
         run_megadetector(detector_config=config)
         self.logger.info("Detection Complete")
-        shutil.copyfile(str(output_file_path), str(self.logdir.joinpath(output_file_path.name)))
+        shutil.copyfile(
+            str(output_file_path), str(self.logdir.joinpath(output_file_path.name))
+        )
         if input_file_path is not None:
-            shutil.copyfile(str(input_file_path), str(self.logdir.joinpath(input_file_path.name)))
+            shutil.copyfile(
+                str(input_file_path), str(self.logdir.joinpath(input_file_path.name))
+            )
 
     def exec_mdet_crop(self, config: MDetCropConfig) -> None:
         self.logger.info(f"Start {config.image_source} MegaDetector Cropping...")
@@ -89,7 +96,9 @@ class Runner:
                 f"Invalid Value of mdet_result_path: {config.mdet_result_path}. Please enter."
             )
         if config.output_dir is None:
-            raise ValueError(f"Invalid Value of output_dir: {config.output_dir}. Please enter.")
+            raise ValueError(
+                f"Invalid Value of output_dir: {config.output_dir}. Please enter."
+            )
         run_mdet_crop(config=config)
         self.logger.info("MDet cropping Complete!")
 
@@ -116,7 +125,9 @@ class Runner:
                 str(input_file_path.parent.joinpath(config.result_file_name)),
                 str(self.logdir.joinpath(config.result_file_name)),
             )
-            shutil.copyfile(str(input_file_path), str(self.logdir.joinpath(input_file_path.name)))
+            shutil.copyfile(
+                str(input_file_path), str(self.logdir.joinpath(input_file_path.name))
+            )
         else:
             shutil.copyfile(
                 str(config.image_source.joinpath(config.result_file_name)),
@@ -124,11 +135,13 @@ class Runner:
             )
         self.logger.info("Prediction Complete!")
 
-    def exec_img_summary(self, config: SummaryConfig):
+    def exec_img_summary(self, config: SummaryConfig) -> None:
         self.logger.info(f"Start {config.cls_result_dir} Classifire Summarize...")
         self.logger.info(f"Summarized file: {config.img_summary_name}")
         img_cls_summary(config=config, summary_name=config.img_summary_name)
-        self.logger.info(f"Result file: {config.cls_result_dir.joinpath(config.img_summary_name)}")
+        self.logger.info(
+            f"Result file: {config.cls_result_dir.joinpath(config.img_summary_name)}"
+        )
         shutil.copyfile(
             str(config.cls_result_dir.joinpath(config.img_summary_name)),
             str(self.logdir.joinpath(config.img_summary_name)),

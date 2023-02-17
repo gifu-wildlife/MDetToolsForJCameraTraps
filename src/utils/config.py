@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional, Union
 
 from omegaconf import II, MISSING
-
 from src.utils.tag import ImageSuffix
 
 

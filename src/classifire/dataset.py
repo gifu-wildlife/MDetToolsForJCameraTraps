@@ -6,11 +6,10 @@ import numpy as np
 
 # import pandas as pd
 import torch
-from PIL import Image
-from torchvision import transforms
 import torchvision.transforms.functional as TF
-
+from PIL import Image
 from src.classifire.transforms import LongsideResizeSquarePadding
+from torchvision import transforms
 from utils import image_pathlist_load_from_file
 
 
@@ -28,7 +27,9 @@ class PredictionDetectorDataset(torch.utils.data.Dataset):
             self.data_paths = sorted(
                 list(data_source.glob("**/*.png")) + list(data_source.glob("**/*.jpg"))
             )
-        self.data_paths = image_pathlist_load_from_file(data_source, recursivce=True, exchange=True)
+        self.data_paths = image_pathlist_load_from_file(
+            data_source, recursivce=True, exchange=True
+        )
 
         if transform is None:
             self.transform = transforms.Compose(

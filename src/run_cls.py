@@ -8,12 +8,10 @@ from tqdm import tqdm
 try:
     from src.classifire.dataset import PredictionDetectorDataset
     from src.classifire.models.resnet import Classifire
-    from src.utils import seed_everything
     from src.utils.config import ClsConfig
-except ImportError:
+except ModuleNotFoundError:
     from classifire.dataset import PredictionDetectorDataset
     from classifire.models.resnet import Classifire
-    from utils import seed_everything
     from utils.config import ClsConfig
 
 log = getLogger(__file__)
@@ -21,15 +19,17 @@ log = getLogger(__file__)
 
 def classifire_predict(cls_config: ClsConfig):
     log.info("Start prediction...")
-    if cls_config.get("seed"):
-        seed_everything(cls_config.seed)
 
     log.info("Instantiating model")
-    category = pd.read_csv(cls_config.category_list_path, header=None, index_col=None).values[0]
+    category = pd.read_csv(
+        cls_config.category_list_path, header=None, index_col=None
+    ).values[0]
     ckpt_path = cls_config.model_path
     log.info(f"load ckpt from {str(ckpt_path)}")
     checkpoint = torch.load(str(ckpt_path))
-    model = Classifire(arch=cls_config.architecture, num_classes=len(category), pretrain=False)
+    model = Classifire(
+        arch=cls_config.architecture, num_classes=len(category), pretrain=False
+    )
     model.load_state_dict(checkpoint["state_dict"])
 
     if torch.cuda.is_available() and cls_config.use_gpu:

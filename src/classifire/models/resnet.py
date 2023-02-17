@@ -2,6 +2,8 @@ try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
+
+import torch
 from torch import nn
 from torchvision.models import (
     resnet18,
@@ -33,6 +35,6 @@ class Classifire(nn.Module):
 
         self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         logit = self.model(x)
         return logit
