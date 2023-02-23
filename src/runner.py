@@ -4,7 +4,8 @@ import time
 from typing import Union
 
 from omegaconf import OmegaConf
-from src.run_summary import img_cls_summary
+
+from src.run_summary import img_cls_summary, video_cls_summary
 from src.utils.config import SummaryConfig
 
 try:
@@ -137,16 +138,26 @@ class Runner:
 
     def exec_img_summary(self, config: SummaryConfig) -> None:
         self.logger.info(f"Start {config.cls_result_dir} Classifire Summarize...")
-        self.logger.info(f"Summarized file: {config.img_summary_name}")
-        img_cls_summary(config=config, summary_name=config.img_summary_name)
-        self.logger.info(
-            f"Result file: {config.cls_result_dir.joinpath(config.img_summary_name)}"
+        # self.logger.info(f"Summarized file: {config.img_summary_name}")
+        result_path = img_cls_summary(config=config)
+        self.logger.info(f"Result file: {result_path}")
+        shutil.copyfile(
+            str(result_path),
+            str(self.logdir.joinpath(result_path.name)),
         )
         shutil.copyfile(
             str(config.cls_result_dir.joinpath(config.img_summary_name)),
             str(self.logdir.joinpath(config.img_summary_name)),
         )
         self.logger.info("IMG wise Summary Complete!")
+        if config.is_video_summary:
+            sequence_result_path = video_cls_summary(config=config)
+            self.logger.info(f"Sequence Result file: {sequence_result_path}")
+            shutil.copyfile(
+                str(sequence_result_path),
+                str(self.logdir.joinpath(sequence_result_path.name)),
+            )
+            self.logger.info("MOVIE wise Summary Complete!")
 
     def __check_config(self, config: RootConfig) -> None:
         assert (

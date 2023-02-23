@@ -104,6 +104,6 @@ def classifire_predict(cls_config: ClsConfig) -> Path:
     df.sort_values("filepath").reset_index(drop=True).to_csv(result_path, index=None)
     if cls_config.is_all_category_probs_output:
         all_category_probs_df.sort_values("filepath").reset_index(drop=True).to_csv(
-            data_dir.joinpath("all_category_probs.csv")
+            data_dir.joinpath("all_category_probs.csv", index=None)
         )
     return result_path

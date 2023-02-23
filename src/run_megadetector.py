@@ -5,7 +5,9 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Optional
 
-import pandas as pd
+# import pandas as pd
+from tqdm import tqdm
+
 from megadetector.data_management.annotations.annotation_constants import (
     detector_bbox_category_id_to_name,
 )
@@ -16,9 +18,6 @@ from megadetector.detection.run_detector_batch import (
     write_results_to_file,
 )
 from megadetector.visualization import visualization_utils as vis_utils
-
-# import pandas as pd
-from tqdm import tqdm
 from utils import image_pathlist_load_from_file
 from utils.config import MDetConfig, MDetCropConfig
 from utils.timer import Timer
@@ -170,14 +169,14 @@ def run_mdet_crop(config: MDetCropConfig) -> list[Path]:
         f"Cropping detection results on {num_saved} images, "
         f"saved to {config.output_dir}."
     )
-    src_filepaths = [
-        config.mdet_result_path.parent.joinpath(entry["file"]).absolute()
-        for entry in images
-    ]
-    pd.DataFrame(
-        [src_filepaths, [None] * len(src_filepaths), [None] * len(src_filepaths)],
-        index=["filepath", "substance", "n_bbox"],
-    ).T.to_csv(config.output_dir.joinpath("img_wise_cls_summary.csv"), index=None)
+    # src_filepaths = [
+    #     config.mdet_result_path.parent.joinpath(entry["file"]).absolute()
+    #     for entry in images
+    # ]
+    # pd.DataFrame(
+    #     [src_filepaths, [None] * len(src_filepaths), [None] * len(src_filepaths)],
+    #     index=["filepath", "substance", "n_bbox"],
+    # ).T.to_csv(config.output_dir.joinpath("img_wise_cls_summary.csv"), index=None)
     return croped_img_paths
 
 

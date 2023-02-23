@@ -57,9 +57,10 @@ class ClsConfig:
 class SummaryConfig:
     cls_result_dir: Path = MISSING
     cls_result_file_name: str = "classifire_prediction_result.csv"
+    category_list_path: Path = Path("models/classifire/category.txt")
     mdet_result_path: Path = MISSING
     img_summary_name: str = "img_wise_cls_summary.csv"
-    # cls_result_csv: Optional[Path] = MISSING
+    is_video_summary: bool = True
 
 
 @dataclass
