@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from omegaconf import II, MISSING
+
 from src.utils.tag import ImageSuffix
 
 
@@ -49,12 +50,14 @@ class ClsConfig:
     architecture: str = "resnet50"
     num_classes: int = -1
     use_gpu: bool = True
+    is_all_category_probs_output: bool = False
 
 
 @dataclass
 class SummaryConfig:
     cls_result_dir: Path = MISSING
     cls_result_file_name: str = "classifire_prediction_result.csv"
+    mdet_result_path: Path = MISSING
     img_summary_name: str = "img_wise_cls_summary.csv"
     # cls_result_csv: Optional[Path] = MISSING
 
@@ -78,7 +81,9 @@ class RootConfig:
     output_dir: Optional[Path] = None
     mdet_result_path: Optional[Path] = None
     log_dir: Path = Path("logs")
-    mdet_config: Optional[MDetConfig] = MDetConfig(image_source=II("session_root"))
+    mdet_config: Optional[MDetConfig] = MDetConfig(
+        image_source=II("session_root"),
+    )
     mdet_crop_config: Optional[MDetCropConfig] = MDetCropConfig(
         image_source=II("session_root"),
         output_dir=II("output_dir"),
@@ -86,7 +91,13 @@ class RootConfig:
     )
     mdet_render_config: Optional[MDetRenderConfig] = MDetRenderConfig()
     clip_config: Optional[ClipConfig] = ClipConfig(
-        video_dir=II("session_root"), output_dir=II("output_dir")
+        video_dir=II("session_root"),
+        output_dir=II("output_dir"),
     )
-    cls_config: Optional[ClsConfig] = ClsConfig(image_source=II("session_root"))
-    summary_config: Optional[SummaryConfig] = SummaryConfig(cls_result_dir=II("session_root"))
+    cls_config: Optional[ClsConfig] = ClsConfig(
+        image_source=II("session_root"),
+    )
+    summary_config: Optional[SummaryConfig] = SummaryConfig(
+        cls_result_dir=II("session_root"),
+        mdet_result_path=II("mdet_result_path"),
+    )
