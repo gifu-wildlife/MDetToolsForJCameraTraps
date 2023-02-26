@@ -5,39 +5,22 @@ from typing import Union
 
 from omegaconf import OmegaConf
 
+from src.run_clip import clip
+from src.run_cls import classifire_predict
+from src.run_megadetector import run_mdet_crop, run_megadetector
 from src.run_summary import img_cls_summary, video_cls_summary
-from src.utils.config import SummaryConfig
-
-try:
-    from src.run_clip import clip
-    from src.run_cls import classifire_predict
-    from src.run_megadetector import run_mdet_crop, run_megadetector
-    from src.utils.config import (
-        ClipConfig,
-        ClsConfig,
-        MDetConfig,
-        MDetCropConfig,
-        MDetRenderConfig,
-        RootConfig,
-    )
-    from src.utils.logger import get_logger
-    from src.utils.tag import SessionTag, session_tag_list
-    from src.utils.timer import Timer
-except ImportError:
-    from run_clip import clip
-    from run_cls import classifire_predict
-    from run_megadetector import run_mdet_crop, run_megadetector
-    from utils.config import (
-        ClipConfig,
-        ClsConfig,
-        MDetConfig,
-        MDetCropConfig,
-        MDetRenderConfig,
-        RootConfig,
-    )
-    from utils.logger import get_logger
-    from utils.tag import SessionTag, session_tag_list
-    from utils.timer import Timer
+from src.utils.config import (
+    ClipConfig,
+    ClsConfig,
+    MDetConfig,
+    MDetCropConfig,
+    MDetRenderConfig,
+    RootConfig,
+    SummaryConfig,
+)
+from src.utils.logger import get_logger
+from src.utils.tag import SessionTag, session_tag_list
+from src.utils.timer import Timer
 
 
 class Runner:

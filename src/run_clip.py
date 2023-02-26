@@ -7,9 +7,10 @@ from typing import Union
 
 import cv2
 from tqdm import tqdm
-from utils import glob_multiext
-from utils.config import ClipConfig
-from utils.tag import ImageSuffix, VideoSuffix
+
+from src.utils import glob_multiext
+from src.utils.config import ClipConfig
+from src.utils.tag import ImageSuffix, VideoSuffix
 
 logger = getLogger("root")
 
@@ -25,7 +26,6 @@ def save_frame(
     banner_size: int = 100,
     verbose: bool = False,
 ) -> None:
-
     """
     crop frames from a video at given intervals.
     """
@@ -108,15 +108,13 @@ def get_img_path(img_dirs: list[Path]) -> Union[tuple[list[str], list[str]], lis
     path_list = []
     for img_dir in img_dirs:
         logger.info(f"Getting Image Path : {img_dir}......")
-
         paths = glob_multiext(ImageSuffix, img_dir)
-
         path_list = path_list + paths
 
     return path_list
 
 
-def clip(config: Union[ClipConfig, argparse.ArgumentParser]):
+def clip(config: Union[ClipConfig, argparse.Namespace]):
     # get video path and save path pairs.
     src_dst_list = get_video_path(config.video_dir, config.output_dir)
 
@@ -158,7 +156,6 @@ def clip(config: Union[ClipConfig, argparse.ArgumentParser]):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser("Clip frame from video")
 
     parser.add_argument("--video_dir", type=str, default="data")

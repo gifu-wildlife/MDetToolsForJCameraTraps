@@ -4,21 +4,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-
-# from scipy.stats import entropy
 from tqdm import tqdm
 
-try:
-    from src.classifire.dataset import PredictionDetectorDataset
-    from src.classifire.models.resnet import Classifire
-    from src.utils.config import ClsConfig
-except ModuleNotFoundError:
-    from classifire.dataset import PredictionDetectorDataset
-    from classifire.models.resnet import Classifire
-    from utils.config import ClsConfig
+from src.classifire.dataset import PredictionDetectorDataset
+from src.classifire.models.resnet import Classifire
+from src.utils.config import ClsConfig
 
 log = getLogger(__file__)
-debug = True
+debug = False
 
 
 def classifire_predict(cls_config: ClsConfig) -> Path:
@@ -104,6 +97,6 @@ def classifire_predict(cls_config: ClsConfig) -> Path:
     df.sort_values("filepath").reset_index(drop=True).to_csv(result_path, index=None)
     if cls_config.is_all_category_probs_output:
         all_category_probs_df.sort_values("filepath").reset_index(drop=True).to_csv(
-            data_dir.joinpath("all_category_probs.csv", index=None)
+            data_dir.joinpath("all_category_probs.csv"), index=None
         )
     return result_path

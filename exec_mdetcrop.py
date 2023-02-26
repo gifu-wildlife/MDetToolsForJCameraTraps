@@ -11,7 +11,9 @@ if cli.get("config_path"):
 else:
     cli_conf = OmegaConf.merge(OmegaConf.load("config/mdet.yaml"), OmegaConf.from_cli())
 schema = OmegaConf.structured(
-    RootConfig(session_root=cli_conf.get("session_root"), output_dir=cli_conf.get("output_dir"))
+    RootConfig(
+        session_root=cli_conf.get("session_root"), output_dir=cli_conf.get("output_dir")
+    )
 )
 if cli_conf.get("output_dir") is None:
     cli_conf.output_dir = cli_conf.session_root + "-crop"

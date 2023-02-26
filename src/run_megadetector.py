@@ -5,22 +5,19 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Optional
 
-# import pandas as pd
 from tqdm import tqdm
 
-from megadetector.data_management.annotations.annotation_constants import (
+from src.megadetector.data_management.annotations.annotation_constants import (
     detector_bbox_category_id_to_name,
 )
-
-# from megadetector.detection.run_detector import ImagePathUtils
-from megadetector.detection.run_detector_batch import (
+from src.megadetector.detection.run_detector_batch import (
     load_and_run_detector_batch,
     write_results_to_file,
 )
-from megadetector.visualization import visualization_utils as vis_utils
-from utils import image_pathlist_load_from_file
-from utils.config import MDetConfig, MDetCropConfig
-from utils.timer import Timer
+from src.megadetector.visualization import visualization_utils as vis_utils
+from src.utils import image_pathlist_load_from_file
+from src.utils.config import MDetConfig, MDetCropConfig
+from src.utils.timer import Timer
 
 DEFAULT_DETECTOR_LABEL_MAP = {
     str(k): v for k, v in detector_bbox_category_id_to_name.items()

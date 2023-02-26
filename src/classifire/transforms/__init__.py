@@ -21,7 +21,7 @@ class LongsideResizeSquarePadding:
         self.interpolation = interpolation
         self.antialias = antialias
 
-    def __call__(self, img) -> Union[Tensor, Image]:
+    def __call__(self, img: Union[Image, Tensor]) -> Union[Tensor, Image]:
         w, h = F.get_image_size(img)
         if w > h:
             r_h, r_w = int((self.size / w) * h), self.size

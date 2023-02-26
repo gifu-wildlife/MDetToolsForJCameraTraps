@@ -4,10 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-try:
-    from src.utils.config import SummaryConfig
-except ModuleNotFoundError:
-    from utils.config import SummaryConfig
+from src.utils.config import SummaryConfig
 
 
 def img_cls_summary(

@@ -2,12 +2,15 @@ import json
 import os
 import random
 import re
-from pathlib import Path
 from logging import getLogger
-import numpy as np
+from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
+
+from src.megadetector.detection.run_detector import ImagePathUtils
+from src.utils.tag import BaseTag
 
 # import sys
 # utils = Path(__file__).parent
@@ -16,9 +19,6 @@ import torch
 #     sys.path.append(str(utils))
 # if not str(mdetlib) in sys.path:
 #     sys.path.append(str(mdetlib))
-
-from utils.tag import BaseTag
-from megadetector.detection.run_detector import ImagePathUtils
 
 
 log = getLogger(__file__)
@@ -47,7 +47,9 @@ def image_pathlist_load_from_file(
             for image_file_name in image_file_names
             if not os.path.join(image_source, "exept_dif") in image_file_name
         ]
-        log.info("{} image files found in the input directory".format(len(image_file_names)))
+        log.info(
+            "{} image files found in the input directory".format(len(image_file_names))
+        )
     # A json list of image paths
     elif image_source.is_file() and image_source.suffix == ".json":
         with open(image_source) as f:
@@ -72,12 +74,16 @@ def image_pathlist_load_from_file(
     return image_file_names
 
 
-def glob_multiext(ext_tags: BaseTag, path: Path):
+def glob_multiext(ext_tags: BaseTag, path: Path) -> list[Path]:
     # ex) .(mp4|avi) -> .mp4 or .avi or .MP4 or .AVI
     pattern = f".({'|'.join([ext.name for ext in ext_tags])})"
     # print(pattern)
     return sorted(
-        [p for p in path.glob("**/*") if re.match(pattern, str(p.suffix), flags=re.IGNORECASE)]
+        [
+            p
+            for p in path.glob("**/*")
+            if re.match(pattern, str(p.suffix), flags=re.IGNORECASE)
+        ]
     )
 
 
