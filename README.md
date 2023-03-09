@@ -44,7 +44,7 @@ download installer and run the script.
 ```bash
 wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 bash Miniconda3-latest-Linux-x86_64.sh
-# If you are using miniconda for the first time, Please ansew "yes" to "Do you wish the installer to initialize Miniconda3 by running conda init?" 
+# If you are using miniconda for the first time, Please answer "yes" to "Do you wish the installer to initialize Miniconda3 by running conda init?" 
 source ~./.bashrc
 ```
 
@@ -84,4 +84,26 @@ conda activate mdet
 ```
 
 ## Usage
+
+1. Download MegaDetector weight file.
+```bash
+bash download_md_model.sh
+```
+2. Run Script 
+```bash
+python exec_clip.py session_root=${video_dir} output_dir=${video_dir}-clip
+```
+```bash
+# python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
+python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
+```
+```bash
+python exec_mdetcrop.py session_root=${video_dir}-clip mdet_result_path=${video_dir}-clip/detector_output.json
+```
+```bash
+python exec_cls.py session_root=${video_dir}-clip-crop
+```
+```bash
+python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
+```
 
