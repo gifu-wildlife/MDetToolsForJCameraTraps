@@ -103,6 +103,8 @@
     python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
     ```
 
+###
+
 ## Verified GPU
 | GPU | VRAM | Result |
 | ---- | ---- | ----|
