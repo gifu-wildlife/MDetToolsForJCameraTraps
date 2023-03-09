@@ -76,6 +76,7 @@ def video_cls_summary(config: SummaryConfig) -> Path:
 
     category_list = detector_output["info"]["prediction_category"]
     filename_list = sorted([output["file"].split(".")[0] for output in detector_output["images"]])
+    filename_hierarchy_num = len(filename_list[0].split("/"))
     category_onehot_list = []
     for img_output in detector_output["images"]:
         if img_output["detections"]:
@@ -88,9 +89,11 @@ def video_cls_summary(config: SummaryConfig) -> Path:
         else:
             category_onehot = np.zeros(len(category_list), dtype=int)
         category_onehot_list.append(category_onehot.tolist())
+    # print([fname.split("/") for fname in filename_list])
     onehot_df = pd.DataFrame(
         [fname.split("/") + onehot for fname, onehot in zip(filename_list, category_onehot_list)],
-        columns=["loc", "movie", "frame"] + category_list,
+        # columns=["loc", "movie", "frame"] + category_list,
+        columns=[i for i in range(filename_hierarchy_num)]  + category_list,
     )
     # print(onehot_df.iloc[90:95])
 
@@ -100,11 +103,14 @@ def video_cls_summary(config: SummaryConfig) -> Path:
             total_sequence_list.append("".join(map(str, d[category].values.tolist())))
         return pd.Series(total_sequence_list, index=category_list)
 
-    sequence_group_df = onehot_df.groupby(["loc", "movie"]).apply(l2s_category_sequence)
+    # sequence_group_df = onehot_df.groupby(["loc", "movie"]).apply(l2s_category_sequence)
+    sequence_group_df = onehot_df.groupby([i for i in range(filename_hierarchy_num)][:-1]).apply(l2s_category_sequence)
     sequence_group_df.to_csv(img_session_root.joinpath("appearance_by_category.csv"))
     # print(type(sequence_group_df), sequence_group_df)
-    loc_list = []
-    movie_list = []
+    # loc_list = []
+    # movie_list = []
+    hierarchy_list = [[] for _ in range(filename_hierarchy_num-1)]
+    # print(hierarchy_list, filename_hierarchy_num)
     total_sequence_list = []
     top1_category_list = []
     top2_category_list = []
@@ -135,8 +141,10 @@ def video_cls_summary(config: SummaryConfig) -> Path:
         #     ["*" if ei == -1 else str(ei) for ei in summary_sequence]
         # ).replace("0", "-")
 
-        loc_list.append(row_name[0])
-        movie_list.append(row_name[1])
+        # loc_list.append(row_name[0])
+        # movie_list.append(row_name[1])
+        for i, _row_name in enumerate(row_name):
+            hierarchy_list[i].append(_row_name)
         total_sequence_list.append(seq2str(summary_sequence))
         top1_sequence_list.append(seq2str(top1_sequence))
         top2_sequence_list.append(seq2str(top2_sequence) if not top2_sequence.sum() == 0 else None)
@@ -151,24 +159,68 @@ def video_cls_summary(config: SummaryConfig) -> Path:
         # if i == 2:
         #     print(summary_sequence)
         #     print(summary_sequence_str, appearance_category)
+    
+
+    # pd.DataFrame(
+    #     [
+    #         [li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i]
+    #         for li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i in zip(
+    #             # loc_list,
+    #             # movie_list,
+    #             total_sequence_list,
+    #             top1_category_list,
+    #             top1_sequence_list,
+    #             top2_category_list,
+    #             top2_sequence_list,
+    #             top3_category_list,
+    #             top3_sequence_list,
+    #         )
+    #     ],
+    #     columns=[i for i in range(filename_hierarchy_num)][:-1]+[
+    #         # "location",
+    #         # "movie",
+    #         "Total Sequence",
+    #         "Top1 Category",
+    #         "Top1 Sequence",
+    #         "Top2 Category",
+    #         "Top2 Sequence",
+    #         "Top3 Category",
+    #         "Top3 Sequence",
+    #     ],
+    # ).to_csv(
+    #     img_session_root.joinpath("sequence_summary.csv"),
+    #     index=None,
+    # )
+    # print(hierarchy_list)
+    hierarchy_list.extend(
+        [total_sequence_list,
+        top1_category_list,
+        top1_sequence_list,
+        top2_category_list,
+        top2_sequence_list,
+        top3_category_list,
+        top3_sequence_list,]
+    )
+    # print(hierarchy_list)
     pd.DataFrame(
-        [
-            [li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i]
-            for li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i in zip(
-                loc_list,
-                movie_list,
-                total_sequence_list,
-                top1_category_list,
-                top1_sequence_list,
-                top2_category_list,
-                top2_sequence_list,
-                top3_category_list,
-                top3_sequence_list,
-            )
-        ],
-        columns=[
-            "location",
-            "movie",
+        hierarchy_list,
+        # [
+        #     [li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i]
+        #     for li, mi, tseqi, cat1i, seq1i, cat2i, seq2i, cat3i, seq3i in zip(
+        #         # loc_list,
+        #         # movie_list,
+        #         total_sequence_list,
+        #         top1_category_list,
+        #         top1_sequence_list,
+        #         top2_category_list,
+        #         top2_sequence_list,
+        #         top3_category_list,
+        #         top3_sequence_list,
+        #     )
+        # ],
+        index=[i for i in range(filename_hierarchy_num)][:-1]+[
+            # "location",
+            # "movie",
             "Total Sequence",
             "Top1 Category",
             "Top1 Sequence",
@@ -177,7 +229,7 @@ def video_cls_summary(config: SummaryConfig) -> Path:
             "Top3 Category",
             "Top3 Sequence",
         ],
-    ).to_csv(
+    ).T.to_csv(
         img_session_root.joinpath("sequence_summary.csv"),
         index=None,
     )
