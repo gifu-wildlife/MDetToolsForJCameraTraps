@@ -149,9 +149,10 @@ class Runner:
         assert os.access(
             str(config.session_root), os.R_OK
         ), f"{config.session_root} does not Readable. Please enter the path where it readable"
-        assert os.access(
-            str(config.session_root), os.W_OK
-        ), f"{config.session_root} does not Writable. Please enter the path where it writable"
+        if config.output_dir is not None:
+            assert os.access(
+                str(config.output_dir), os.W_OK
+            ), f"{config.output_dir} does not Writable. Please enter the path where it writable"
         assert (
             config.session_root.is_absolute()
         ), f"{config.session_root} does not Absolute Path. Please enter the absolute path"
