@@ -69,6 +69,7 @@ def img_cls_summary(
 
 def video_cls_summary(config: SummaryConfig) -> Path:
     mdet_result_path = config.mdet_result_path
+    print(mdet_result_path)
     img_session_root = mdet_result_path.parent
     img_summary_result_path = img_session_root.joinpath(f"{mdet_result_path.stem}_cls.json")
     with open(img_summary_result_path) as f:
@@ -78,7 +79,10 @@ def video_cls_summary(config: SummaryConfig) -> Path:
     filename_list = sorted([output["file"].split(".")[0] for output in detector_output["images"]])
     filename_hierarchy_num = len(filename_list[0].split("/"))
     category_onehot_list = []
-    for img_output in detector_output["images"]:
+    # for i,img_output in enumerate(detector_output["images"]):
+    for img_output in sorted(detector_output["images"], key=lambda img_output: filename_list.index(img_output["file"].split(".")[0])):
+        # if "kuni-009-S8-0081" in img_output["file"]:
+        #     print(filename_list[i], img_output["file"])
         if img_output["detections"]:
             categories = sorted([det["predict"] for det in img_output["detections"]])
             category_indices = [category_list.index(ci) for ci in categories]
@@ -86,6 +90,9 @@ def video_cls_summary(config: SummaryConfig) -> Path:
             category_onehot = np.zeros(len(category_list), dtype=int)
             # category_onehot[category_indices] = 1
             category_onehot[unique_indices] = counts
+            # print(categories)
+            # if "kuni-009-S8-0081" in img_output["file"]:
+            #     print("------", filename_list[i], category_onehot[category_list.index("boar")], "------")
         else:
             category_onehot = np.zeros(len(category_list), dtype=int)
         category_onehot_list.append(category_onehot.tolist())
@@ -128,6 +135,7 @@ def video_cls_summary(config: SummaryConfig) -> Path:
             [np.array(list(map(int, list(seq[ci])))) for ci in category_list]
         )
         # top1_appearance_category = category_list[np.argmax(category_sequence.sum(axis=1))]
+
         top1_appearance_category = category_list[np.argsort(category_sequence.sum(axis=1))[::-1][0]]
         top2_appearance_category = category_list[np.argsort(category_sequence.sum(axis=1))[::-1][1]]
         top3_appearance_category = category_list[np.argsort(category_sequence.sum(axis=1))[::-1][2]]
@@ -146,10 +154,12 @@ def video_cls_summary(config: SummaryConfig) -> Path:
         for i, _row_name in enumerate(row_name):
             hierarchy_list[i].append(_row_name)
         total_sequence_list.append(seq2str(summary_sequence))
-        top1_sequence_list.append(seq2str(top1_sequence))
+        
+        top1_sequence_list.append(seq2str(top1_sequence) if not top1_sequence.sum() == 0 else None)
         top2_sequence_list.append(seq2str(top2_sequence) if not top2_sequence.sum() == 0 else None)
         top3_sequence_list.append(seq2str(top3_sequence) if not top3_sequence.sum() == 0 else None)
-        top1_category_list.append(top1_appearance_category)
+
+        top1_category_list.append(top1_appearance_category if not top1_sequence.sum() == 0 else "NA")
         top2_category_list.append(
             top2_appearance_category if not top2_sequence.sum() == 0 else None
         )
