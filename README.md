@@ -23,8 +23,8 @@
 
     Download installer and run the script for Unix-like platform.  
     ```bash
-    wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-    bash Miniconda3-latest-Linux-x86_64.sh
+    wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh"
+    bash Mambaforge-Linux-x86_64.sh
     # If you are using miniconda for the first time, Please ansew "yes" to "Do you wish the installer to initialize Miniconda3 by running conda init?" 
     source ~/.bashrc
     ```
@@ -56,7 +56,7 @@
 3. create conda environment.
 
     ```bash
-    conda env create -f=environment.yml
+    mamba env create -f=environment.yml
     conda activate mdet
     ```
 
@@ -86,24 +86,27 @@
     bash download_md_model.sh
     ```
 2. Run Script 
+* Movie Clip
     ```bash
     python exec_clip.py session_root=${video_dir} output_dir=${video_dir}-clip
     ```
+* Run MegaDetector
     ```bash
     # python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
     python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
     ```
+* Bounding Box Crop
     ```bash
     python exec_mdetcrop.py session_root=${video_dir}-clip mdet_result_path=${video_dir}-clip/detector_output.json
     ```
+* Run Classifire
     ```bash
     python exec_cls.py session_root=${video_dir}-clip-crop
     ```
+* Run Summary
     ```bash
     python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
     ```
-
-###
 
 ## Verified GPU
 | GPU | VRAM | Result |
@@ -116,3 +119,43 @@
 | RTX 3050 (Notebooks) | 4GB | Failure (Insufficient VRAM) |
 
 We recommend a GPU with at least 8GB of VRAM
+
+## Directory Tree
+<pre>
+.
+├── config
+│   └── mdet.yaml
+├── logs
+├── models
+│   └── classifire
+├── src
+│   ├── __init__.py
+│   ├── classifire
+│   │   ├── dataset.py
+│   │   ├── models
+│   │   │   └── resnet.py
+│   │   └── transforms
+│   │       └── __init__.py
+│   ├── megadetector
+│   ├── utils
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── logger.py
+│   │   ├── tag.py
+│   │   └── timer.py
+│   ├── run_clip.py
+│   ├── run_cls.py
+│   ├── run_megadetector.py
+│   ├── run_summary.py
+│   └── runner.py
+├── LICENSE
+├── README.md
+├── download_md_model.sh
+├── environment.yml
+├── exec_clip.py
+├── exec_cls.py
+├── exec_imgsummary.py
+├── exec_mdet.py
+├── exec_mdetcrop.py
+└── exec_sample.sh
+</pre>
