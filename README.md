@@ -236,7 +236,7 @@ We recommend a GPU with at least 8GB of VRAM
 │   │   │   └── resnet.py
 │   │   └── transforms
 │   │       └── __init__.py
-│   ├── megadetector
+│   ├── megadetector  # commits on on Oct 12, 2022
 │   ├── utils
 │   │   ├── __init__.py
 │   │   ├── config.py
@@ -259,3 +259,4 @@ We recommend a GPU with at least 8GB of VRAM
 ├── exec_mdetcrop.py
 └── exec_sample.sh
 ```
+src/megadetector is for [microsoft/CameraTraps](https://github.com/microsoft/CameraTraps) [commits on Oct 12, 2022](https://github.com/microsoft/CameraTraps/commit/33d1d9fa383e0935e8115b325e538811bd92b65f)
