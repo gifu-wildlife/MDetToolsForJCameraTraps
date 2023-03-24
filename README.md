@@ -134,15 +134,15 @@ exec_clip.py
 python exec_clip.py session_root=??? output_dir=??? clip_config.start_frame=0 clip_config.end_frame=None clip_config.step=30 clip_config.ext=jpg clip_config.remove_banner=True
 ```
 
-| Parameter | Status | Description |
-| ---- | :----: | ---- |
-| session_root | required | ~~~ |
-| output_dir | required | ~~~ |
-| clip_config.start_frame | (optional) | ~~~ |
-| clip_config.end_frame | (optional) | ~~~ |
-| clip_config.step | (optional) | ~~~ |
-| clip_config.ext | (optional) | ~~~ |
-| clip_config.remove_banner | (optional) | ~~~ |
+| Parameter | Status | Type | Description |
+| ---- | :----: | ---- | ---- |
+| session_root | required | str(path) | ~~~ |
+| output_dir | required | str(path) | ~~~ |
+| clip_config.start_frame | (optional) | int | ~~~ |
+| clip_config.end_frame | (optional) | int | ~~~ |
+| clip_config.step | (optional) | int | ~~~ |
+| clip_config.ext | (optional) | str | ~~~ |
+| clip_config.remove_banner | (optional) | bool | ~~~ |
 
 exec_mdet.py
 
@@ -150,15 +150,15 @@ exec_mdet.py
 python exec_mdet.py session_root=??? mdet_config.model_path=models/md_v4.1.0.pb mdet_config.threshold=0.95 mdet_config.output_absolute_path=True mdet_config.ncores=[your cpu cores] mdet_config.verbose=False mdet_config.recursive=True
 ```
 
-| Parameter | Status | Description |
-| ---- | :----: | ---- |
-| session_root | required | ~~~ |
-| mdet_config.model_path | (optional) | ~~~ |
-| mdet_config.threshold | (optional) | ~~~ |
-| mdet_config.output_absolute_path | (optional) | ~~~ |
-| mdet_config.ncores | (optional) | ~~~ |
-| mdet_config.verbose | (optional) | ~~~ |
-| mdet_config.recursive | (optional) | ~~~ |
+| Parameter | Status | Type | Description |
+| ---- | :----: | ---- | ---- |
+| session_root | required | str(path) | ~~~ |
+| mdet_config.model_path | (optional) | str(path) | ~~~ |
+| mdet_config.threshold | (optional) | float | ~~~ |
+| mdet_config.output_absolute_path | (optional) | bool | ~~~ |
+| mdet_config.ncores | (optional) | int | ~~~ |
+| mdet_config.verbose | (optional) | bool | ~~~ |
+| mdet_config.recursive | (optional) | bool | ~~~ |
 
 exec_mdetcrop.py
 
@@ -166,17 +166,45 @@ exec_mdetcrop.py
 python exec_mdet.py session_root=??? output_dir=${session_root}-crop mdet_result_path=${session_root}/detector_output.json mdet_crop_config.threshold=0.95 mdet_crop_config.ncores=[your cpu cores]
 ```
 
+| Parameter | Status | Type | Description |
+| ---- | :----: | ---- | ---- |
+| session_root | required | str(path) | ~~~ |
+| output_dir | required | str(path) | ~~~ |
+| mdet_result_path | required | str(path) | ~~~ |
+| mdet_crop_config.threshold | (optional) | float | ~~~ |
+| mdet_crop_config.ncores | (optional) | int | ~~~ |
+
 exec_cls.py
 
 ```bash
-python exec_cls.py
+python exec_cls.py session_root=??? cls_config.model_path=models/classifire/15cat_50epoch_resnet50.pth cls_config.category_list_path=models/classifire/category.txt cls_config.result_file_name=classifire_prediction_result.csv cls_config.architecture=resnet50 cls_config.use_gpu=True cls_config.is_all_category_probs_output=False
 ```
+
+| Parameter | Status | Type | Description |
+| ---- | :----: | ---- | ---- |
+| session_root | required | str(path) | ~~~ |
+| cls_config.model_path | (optional) | str(path) | ~~~ |
+| cls_config.category_list_path | (optional) | str(path) | ~~~ |
+| cls_config.result_file_name | (optional) | str | ~~~ |
+| cls_config.architecture | (optional) | Literal["resnet50"] | ~~~ |
+| cls_config.use_gpu | (optional) | bool | ~~~ |
+| cls_config.is_all_category_probs_output | (optional) | bool | ~~~ |
+
 
 exec_imgsummary.py
 
 ```bash
-python exec_imgsummary.py
+python exec_imgsummary.py session_root=??? mdet_result_path=??? summary_config.cls_result_file_name=classifire_prediction_result.csv summary_config.category_list_path=models/classifire/category.txt summary_config.img_summary_name=img_wise_cls_summary.csv summary_config.is_video_summary=True
 ```
+
+| Parameter | Status | Type | Description |
+| ---- | :----: | ---- | ---- |
+| session_root | required | str(path) | ~~~ |
+| mdet_result_path | required | str(path) | ~~~ |
+| summary_config.cls_result_file_name | (optional) | str | ~~~ |
+| summary_config.category_list_path | (optional) | str(path) | ~~~ |
+| summary_config.img_summary_name | (optional) | str | ~~~ |
+| summary_config.is_video_summary | (optional) | bool | ~~~ |
 
 ## Verified GPU
 
