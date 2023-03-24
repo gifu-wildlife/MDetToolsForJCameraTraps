@@ -6,7 +6,7 @@
 
 ### Prerequisites
 
-* NVIDIA Driver
+* NVIDIA Driver：NVIDIAドライバーのインストール
 
     ```bash
     sudo apt install nvidia-driver-***
