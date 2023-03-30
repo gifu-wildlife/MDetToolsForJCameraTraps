@@ -126,7 +126,7 @@ This program was supported by the Environment Research and Technology Developmen
 5. Download Resnet50 weight and category files：Resnet50の重みファイルとカテゴリtxtのダウンロードスクリプトを実行
 
     ```bash
-    bash download_md_model.sh
+    bash download_resnet50_model.sh
     ```
 
 
