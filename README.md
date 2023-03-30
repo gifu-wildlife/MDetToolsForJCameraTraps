@@ -1,12 +1,34 @@
 # MDetToolsForJCameraTraps
 
-カメラトラップ画像/映像向けMegaDetector実行スクリプト．
+## What's this：このプログラムについて
 
-## Get Started
+The purpose of this program is to detect wildlife from camera trap footage using [MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps) and to use a different classification model (resnet50) trained with wildlife images taken in Japan to identify the detected animals to species. This document is minimally descriptive at this time and will be updated as needed.  
+このプログラムは、[MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps)を利用してカメラトラップ映像から野生動物を検出し、検出された動物を日本国内で取得された野生動物画像で学習を行った別の分類モデル（resnet50）で種判別することを目的として作成されました。このドキュメントは現時点では最低限の記述しかされていないため、今後随時更新していく予定です。
 
-### Prerequisites
+A program on learning species classification models will also be available on github at a later date (under construction). Note that the species classification model at this time uses the same dataset used in [Ando et al. (2019, in Japanese)](https://doi.org/10.11238/mammalianscience.59.49), so the number of images per animal species is unbalanced.  
+種判別モデル構築に関するプログラムも後日githubで公開予定です。なお、現時点における種判別モデルは、[安藤ら(2019)]( https://doi.org/10.11238/mammalianscience.59.49)で用いたものと同じデータセットを使っているため、動物種毎の画像数はアンバランスです。
 
-* NVIDIA Driver：NVIDIAドライバのインストール
+This program was supported by the Environment Research and Technology Development Fund (JPMEERF20204G01,[Reports in Japansese](https://sites.google.com/view/hyogowildlife/suishin4g2001)) of the Environmental Restoration and Conservation Agency, and is published according to MIT license.  
+このプログラムは環境省の環境研究総合推進費（4G-2001 イノシシの個体数密度およびCSF感染状況の簡易モニタリング手法の開発：[報告集](https://sites.google.com/view/hyogowildlife/suishin4g2001)）を受けて作成されたものであり、MITライセンスにしたがって公開されています。  
+
+---
+
+
+
+## Get Started：はじめに
+
+<br />
+
+### Prerequisites：環境整備
+
+* OS  
+    The following code was tested on Ubuntu 20.04LTS (x86-64).  
+    During the test run, .mp4 was used as the video file format and .jpg as the still image file format.  
+    以下のコードはUbuntu 20.04LTS(x86-64)で動作確認しています。  
+    動作確認時、動画ファイル形式は.mp4、静止画ファイル形式は.jpgを用いました。
+
+
+*  NVIDIA Driver
 
     ```bash
     sudo apt install nvidia-driver-***
@@ -14,119 +36,146 @@
 
     Please refer to [NVIDIA Driver Version Check](https://www.nvidia.com/Download/index.aspx?lang=en-us).
     *** is a placeholder. Please enter the recommended nvidia driver version.  
+    [NVIDIAドライババージョンチェック](https://www.nvidia.com/Download/index.aspx?lang=en-us)を参照し、***に推奨されるnvidiaドライババージョンを入力した上で実行してください。  
 
-    check installation.
+
+    Check installation.  
+    インストール状況の確認。
 
     ```bash
     nvidia-smi  # NVIDIA Driver installation check
     ```
 
-    If nvidia-smi does not work, Try Rebooting.
+    If nvidia-smi does not work, Try Rebooting.  
+    nvidia-smiコマンドが動作しない場合は再起動してみてください。
 
 * Conda
 
-    Download installer and run the script for Unix-like platform.  
+    Download installer and run the script.  
+    インストーラーをダウンロードしてスクリプトを実行します。
 
     ```bash
     wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh"
     bash Mambaforge-Linux-x86_64.sh
-    # If you are using miniconda for the first time, Please ansew "yes" to "Do you wish the installer to initialize Miniconda3 by running conda init?" 
     source ~/.bashrc
     ```
 
-    For more information, please refer to [miniconda official](https://docs.conda.io/en/latest/miniconda.html)
+    For more information, please refer to [miniforge repository](https://github.com/conda-forge/miniforge) and/or [Mamba documentation](https://mamba.readthedocs.io/en/latest/index.html).  
+    詳細については[miniforge repository](https://github.com/conda-forge/miniforge) や[Mamba documentation](https://mamba.readthedocs.io/en/latest/index.html)を参照してください。  
 
-### Instllation
+<br />
 
-1. Clone the Repository
+### Instllation：インストール
+
+1. Clone the Repository：リポジトリの複製
+
+    Run ```git clone```,  
+    ```git clone```を実行するか、
 
     ```bash
     git clone https://github.com/gifu-wildlife/MDetToolsForJCameraTraps.git
     ```
 
-    or Download ZIP and Unzip in any directory of yours
+    or Download ZIP and Unzip in any directory of yours.  
+    もしくはZIPをダウンロードし、任意のディレクトリで解凍してください。
 
     ![Screenshot from 2022-11-11 13-07-09](https://user-images.githubusercontent.com/50891743/201261079-74254fd8-ce4f-4a0f-9085-3a5209d40f7c.png)
 
-2. Move Project Directory
+2. Move Project Directory：プロジェクトディレクトリへの移動
 
     ```bash
     cd MDetToolsForJCameraTraps
+    # or
+    # cd MDetToolsForJCameraTraps-main
     ```
 
-    or
-
-    ```bash
-    cd MDetToolsForJCameraTraps-main
-    ```
-
-3. create conda environment.
+3. create conda environment：conda環境の構築
 
     ```bash
     mamba env create -f=environment.yml
     conda activate mdet
     ```
 
-#### Requirement
+    #### Requirement
+    必要なpythonパッケージは以下のとおり。
 
-* python=3.9
-* pytorch-gpu==1.10.1
-* torchvision==0.11.2
-* cudatoolkit=11.3
-* pandas
-* omegaconf
-* tqdm
-* opencv
-* tensorflow
-* humanfriendly
-* ca-certificates
-* certifi
-* openssl
-* matplotlib
-* jsonpickle
+    * python=3.9
+    * pytorch-gpu==1.10.1
+    * torchvision==0.11.2
+    * cudatoolkit=11.3
+    * pandas
+    * omegaconf
+    * tqdm
+    * opencv
+    * tensorflow
+    * humanfriendly
+    * ca-certificates
+    * certifi
+    * openssl
+    * matplotlib
+    * jsonpickle  
+  
+<br />
 
-## Usage
-
-1. Download MegaDetector weight file.
+4. Download MegaDetector weight file：MegaDetectorの重みファイルのダウンロードスクリプトを実行
 
     ```bash
     bash download_md_model.sh
     ```
 
-2. Run Script
+5. Download Resnet50 weight and category files：Resnet50の重みファイルとカテゴリtxtのダウンロードスクリプトを実行
 
-* Movie Clip
+    ```bash
+    bash download_md_model.sh
+    ```
+
+
+
+---
+
+## Usage：使い方
+
+
+2. Run Scripts  
+   各スクリプトの実行
+
+* Movie Clip  
+  動画から静止画を抽出
 
     ```bash
     python exec_clip.py session_root=${video_dir} output_dir=${video_dir}-clip
     ```
 
-* Run MegaDetector
+* Run MegaDetector  
+  MegaDetectorの実行
 
     ```bash
-    # python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
     python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
+    # python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
     ```
 
-* Bounding Box Crop
+* Bounding Box Crop  
+  バウンディングボックスでクロップ
 
     ```bash
     python exec_mdetcrop.py session_root=${video_dir}-clip mdet_result_path=${video_dir}-clip/detector_output.json
     ```
 
-* Classification
+* Classification  
+  (クロップされた画像の)分類
 
     ```bash
     python exec_cls.py session_root=${video_dir}-clip-crop
     ```
 
-* Summarize
+* Summarize  
+  結果の要約
 
     ```bash
     python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
     ```
 
-### Parameter
+### Parameter：各種パラメーター（整備中）
 
 exec_clip.py
 
@@ -206,7 +255,9 @@ python exec_imgsummary.py session_root=??? mdet_result_path=??? summary_config.c
 | summary_config.img_summary_name | (optional) | str | ~~~ |
 | summary_config.is_video_summary | (optional) | bool | ~~~ |
 
-## Verified GPU
+---
+
+## Verified GPU：各種GPUを用いた動作確認
 
 | GPU | VRAM | Result |
 | ---- | ---- | ----|
@@ -217,9 +268,11 @@ python exec_imgsummary.py session_root=??? mdet_result_path=??? summary_config.c
 | GTX 1080 | 8GB | Success |
 | RTX 3050 (Notebooks) | 4GB | Failure (Insufficient VRAM) |
 
-We recommend a GPU with at least 8GB of VRAM
+We recommend a GPU with at least 8GB of VRAM。
+以上の結果から、8GB以上のVRAMを搭載したGPUを推奨します。
 
-## Directory Tree
+---
+## Directory Tree：フォルダ構造
 
 ```binary
 .
@@ -259,4 +312,4 @@ We recommend a GPU with at least 8GB of VRAM
 ├── exec_mdetcrop.py
 └── exec_sample.sh
 ```
-src/megadetector is for [microsoft/CameraTraps](https://github.com/microsoft/CameraTraps) [commits on Oct 12, 2022](https://github.com/microsoft/CameraTraps/commit/33d1d9fa383e0935e8115b325e538811bd92b65f)
+The scripts of src/megadetector is from [microsoft/CameraTraps](https://github.com/microsoft/CameraTraps) [commits on Oct 12, 2022](https://github.com/microsoft/CameraTraps/commit/33d1d9fa383e0935e8115b325e538811bd92b65f)
