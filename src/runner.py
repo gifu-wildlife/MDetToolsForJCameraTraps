@@ -150,6 +150,7 @@ class Runner:
             str(config.session_root), os.R_OK
         ), f"{config.session_root} does not Readable. Please enter the path where it readable"
         if config.output_dir is not None:
+            os.makedirs(config.output_dir, exist_ok=True)
             assert os.access(
                 str(config.output_dir), os.W_OK
             ), f"{config.output_dir} does not Writable. Please enter the path where it writable"
