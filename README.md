@@ -209,7 +209,7 @@ This program was supported by the Environment Research and Technology Developmen
     python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
     ```
 
-    A summary of the results per image (````img_wise_cls_summary.csv```) is output in the ```${video_dir}-clip-crop``` directory, and a summary of the results per video (```sequence_summary.csv```) in the ```${video_dir}-clip``` directory.
+    A summary of the results per image (```img_wise_cls_summary.csv```) is output in the ```${video_dir}-clip-crop``` directory, and a summary of the results per video (```sequence_summary.csv```) in the ```${video_dir}-clip``` directory.
     静止画単位の結果のサマリーが（```img_wise_cls_summary.csv```）が```${video_dir}-clip-crop```ディレクトリ内に、動画単位の結果のサマリーが(```sequence_summary.csv```)が```${video_dir}-clip```ディレクトリ内に、それぞれ出力されます。
 
 ### Parameter：各種パラメーター（整備中）
