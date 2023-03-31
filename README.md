@@ -23,7 +23,7 @@ This program was supported by the Environment Research and Technology Developmen
 
 * OS  
     The following code was tested on Ubuntu 20.04LTS (x86-64).  
-    During the test run, .mp4 was used as the video file format and .jpg as the still image file format.  
+    During the test run, .mp4 was used as the video file format and .jpg as the image file format.  
     以下のコードはUbuntu 20.04LTS(x86-64)で動作確認しています。  
     動作確認時、動画ファイル形式は.mp4、静止画ファイル形式は.jpgを用いました。
 
@@ -76,12 +76,12 @@ This program was supported by the Environment Research and Technology Developmen
     git clone https://github.com/gifu-wildlife/MDetToolsForJCameraTraps.git
     ```
 
-    or Download ZIP and Unzip in any directory of yours.  
-    もしくはZIPをダウンロードし、任意のディレクトリで解凍してください。
+    or Download ZIP and Unzip in any directory of yours. The following codes are assumed that it was extracted to the user's home directory (`/home/${USER}/`).  
+    もしくはZIPをダウンロードし、任意のディレクトリで解凍してください。なお、このページではユーザのホームディレクトリ（`/home/${USER}/`）に解凍した前提でスクリプトを記載しています。
 
     ![Screenshot from 2022-11-11 13-07-09](https://user-images.githubusercontent.com/50891743/201261079-74254fd8-ce4f-4a0f-9085-3a5209d40f7c.png)
 
-2. Move Project Directory：プロジェクトディレクトリへの移動
+2. Move Project Directory：プロジェクトディレクトリへ移動
 
     ```bash
     cd MDetToolsForJCameraTraps
@@ -126,6 +126,7 @@ This program was supported by the Environment Research and Technology Developmen
 5. Download Resnet50 weight and category files：Resnet50の重みファイルとカテゴリtxtのダウンロードスクリプトを実行
 
     ```bash
+    sudo apt install curl
     bash download_resnet50_model.sh
     ```
 
@@ -135,9 +136,25 @@ This program was supported by the Environment Research and Technology Developmen
 
 ## Usage：使い方
 
+1. Download sample data：サンプルデータのダウンロード
+   
+    ```bash
+    bash download_sample_data.sh
+    ```
+    Note: TThe sample data is extracted in the directory where `download_sample_data.sh` was executed. The following scripts are are assumed that the data is saved in `/home/${USER}/MDetToolsForJCameraTraps/`.  
+    注意：サンプルデータはコードが実行されたディレクトリに保存されます。このページでは `/home/${USER}/MDetToolsForJCameraTraps/` に解凍された前提で以降のスクリプトを記載しています。
 
-2. Run Scripts  
-   各スクリプトの実行
+2. Run Scripts with sample data：サンプルデータに対するスクリプト実行例
+   
+* Set environment variables for input/output directory  
+  入出力ディレクトリに関する環境変数の設定
+
+   ```bash
+   video_dir=/home/${USER}/MDetToolsForJCameraTraps/sample_data/sample_session/
+   ```
+
+    Note: The environment variable `${video_dir}` is used this sample code to keep the code short, but you can set any input/output directory for such as “session_root”, “output_dir”, and so on. When the output of the previous process is used in a subsequent process, the appropriate file path for the previous output must be specified. Also, the output directory must be writable.
+    注意：今回はコードを短くするために環境変数`${video_dir}`を用いていますが、session_rootやoutput_dir等、入出力のディレクトリは任意に設定できます。前の処理のoutputを後続の処理で使う時は適切なファイルパスを指定してください。また、出力先のディレクトリは書き込み可能である必要があります。
 
 * Movie Clip  
   動画から静止画を抽出
@@ -151,6 +168,8 @@ This program was supported by the Environment Research and Technology Developmen
 
     ```bash
     python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
+
+    # For MegaDetector v5.0,
     # python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
     ```
 
