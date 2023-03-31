@@ -199,7 +199,7 @@ This program was supported by the Environment Research and Technology Developmen
     python exec_cls.py session_root=${video_dir}-clip-crop
     ```
 
-    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip`` directory.
+    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
     ```${video_dir}-clip-crop```ディレクトリ内にclassificationの結果(```classifire_prediction_result.csv```)が出力されます。    
 
 * Summarize  
