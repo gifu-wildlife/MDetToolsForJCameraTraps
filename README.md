@@ -179,7 +179,7 @@ This program was supported by the Environment Research and Technology Developmen
     python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
     ```  
 
-    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip`` directory.
+    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
     ```${video_dir}-clip```ディレクトリ内にMegaDetectorの結果(```detector_output.json```)が出力されます。
     
 * Bounding Box Crop  
