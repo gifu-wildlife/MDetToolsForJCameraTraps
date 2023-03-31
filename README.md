@@ -67,6 +67,9 @@ This program was supported by the Environment Research and Technology Developmen
 
 ### Instllation：インストール
 
+<br />
+
+
 1. Clone the Repository：リポジトリの複製
 
     Run ```git clone```,  
@@ -81,7 +84,10 @@ This program was supported by the Environment Research and Technology Developmen
 
     ![Screenshot from 2022-11-11 13-07-09](https://user-images.githubusercontent.com/50891743/201261079-74254fd8-ce4f-4a0f-9085-3a5209d40f7c.png)
 
-2. Move Project Directory：プロジェクトディレクトリへ移動
+<br />
+
+
+1. Move Project Directory：プロジェクトディレクトリへ移動
 
     ```bash
     cd MDetToolsForJCameraTraps
@@ -89,12 +95,18 @@ This program was supported by the Environment Research and Technology Developmen
     # cd MDetToolsForJCameraTraps-main
     ```
 
+<br />
+
+
 3. create conda environment：conda環境の構築
 
     ```bash
     mamba env create -f=environment.yml
     conda activate mdet
     ```
+
+<br />
+
 
     #### Requirement
     必要なpythonパッケージは以下のとおり。
@@ -136,15 +148,24 @@ This program was supported by the Environment Research and Technology Developmen
 
 ## Usage：使い方
 
+<br />
+
 1. Download sample data：サンプルデータのダウンロード
    
     ```bash
     bash download_sample_data.sh
     ```
-    Note: TThe sample data is extracted in the directory where `download_sample_data.sh` was executed. The following scripts are are assumed that the data is saved in `/home/${USER}/MDetToolsForJCameraTraps/`.  
+
+    Note: The sample data is extracted in the directory where `download_sample_data.sh` was executed. The following scripts are are assumed that the data is saved in `/home/${USER}/MDetToolsForJCameraTraps/`.  
     注意：サンプルデータはコードが実行されたディレクトリに保存されます。このページでは `/home/${USER}/MDetToolsForJCameraTraps/` に解凍された前提で以降のスクリプトを記載しています。
 
-2. Run Scripts with sample data：サンプルデータに対するスクリプト実行例
+<br />
+
+
+2. Run Scripts with sample data：サンプルデータに対するスクリプト実行例    
+    Note:For the time being, only an example of execution using a video file (.mp4) is described.  
+    注意：現時点では動画ファイル（.mp4）を用いた実行例のみ記載しています。
+
    
 * Set environment variables for input/output directory  
   入出力ディレクトリに関する環境変数の設定
@@ -153,8 +174,8 @@ This program was supported by the Environment Research and Technology Developmen
    video_dir=/home/${USER}/MDetToolsForJCameraTraps/sample_data/sample_session/
    ```
 
-    Note: The environment variable `${video_dir}` is used this sample code to keep the code short, but you can set any input/output directory for such as “session_root”, “output_dir”, and so on. When the output of the previous process is used in a subsequent process, the appropriate file path for the previous output must be specified. Also, the output directory must be writable.
-    注意：今回はコードを短くするために環境変数`${video_dir}`を用いていますが、session_rootやoutput_dir等、入出力のディレクトリは任意に設定できます。前の処理のoutputを後続の処理で使う時は適切なファイルパスを指定してください。また、出力先のディレクトリは書き込み可能である必要があります。
+    Note: The environment variable `${video_dir}` is used this sample code to keep the scripts short, but you can set any input/output directory for such as “session_root”, “output_dir”, and so on. When the output of the previous process is used in a subsequent process, the appropriate file path for the previous output must be specified. Also, the output directory must be writable.  
+    注意：今回はスクリプトを短くするために環境変数`${video_dir}`を用いていますが、session_rootやoutput_dir等、入出力のディレクトリは任意に設定できます。前の処理のoutputを後続の処理で使う時は適切なファイルパスを指定してください。また、出力先のディレクトリは書き込み可能である必要があります。
 
 * Movie Clip  
   動画から静止画を抽出
@@ -174,14 +195,14 @@ This program was supported by the Environment Research and Technology Developmen
     ```
 
 * Bounding Box Crop  
-  バウンディングボックスでクロップ
+  バウンディングボックスで動物の領域を切り出し
 
     ```bash
     python exec_mdetcrop.py session_root=${video_dir}-clip mdet_result_path=${video_dir}-clip/detector_output.json
     ```
 
 * Classification  
-  (クロップされた画像の)分類
+  切り出された画像の種分類
 
     ```bash
     python exec_cls.py session_root=${video_dir}-clip-crop
