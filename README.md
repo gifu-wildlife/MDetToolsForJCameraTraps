@@ -2,13 +2,13 @@
 
 ## What's this：このプログラムについて
 
-The purpose of this program is to detect wildlife from camera trap footage using [MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps) and to use a different classification model (resnet50) trained with wildlife images taken in Japan to identify the detected animals to species. This document is minimally descriptive at this time and will be updated as needed.  
+The purpose of this program is to detect wildlife from camera trap image/video using [MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps) and to use a different classification model (resnet50) trained with wildlife images taken in Japan to identify the detected animals to species. This document is minimally descriptive at this time and will be updated as needed.  
 このプログラムは、[MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps)を利用してカメラトラップ映像から野生動物を検出し、検出された動物を日本国内で取得された野生動物画像で学習を行った別の分類モデル（resnet50）で種判別することを目的として作成されました。このドキュメントは現時点では最低限の記述しかされていないため、今後随時更新していく予定です。
 
 A program on learning species classification models will also be available on github at a later date (under construction). Note that the species classification model at this time uses the same dataset used in [Ando et al. (2019, in Japanese)](https://doi.org/10.11238/mammalianscience.59.49), so the number of images per animal species is unbalanced.  
 種判別モデル構築に関するプログラムも後日githubで公開予定です。なお、現時点における種判別モデルは、[安藤ら(2019)]( https://doi.org/10.11238/mammalianscience.59.49)で用いたものと同じデータセットを使っているため、動物種毎の画像数はアンバランスです。
 
-This program was supported by the Environment Research and Technology Development Fund (JPMEERF20204G01,[Reports in Japansese](https://sites.google.com/view/hyogowildlife/suishin4g2001)) of the Environmental Restoration and Conservation Agency, and is published according to MIT license.  
+This program was supported by the Environment Research and Technology Development Fund (JPMEERF20204G01,[Reports in Japanese](https://sites.google.com/view/hyogowildlife/suishin4g2001)) of the Environmental Restoration and Conservation Agency, and is published according to MIT license.  
 このプログラムは環境省の環境研究総合推進費（4G-2001 イノシシの個体数密度およびCSF感染状況の簡易モニタリング手法の開発：[報告集](https://sites.google.com/view/hyogowildlife/suishin4g2001)）を受けて作成されたものであり、MITライセンスにしたがって公開されています。  
 
 ---
