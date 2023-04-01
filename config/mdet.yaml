@@ -1,11 +1,20 @@
-session_root:
+session_root: /home/dl-node01/MDetToolsForJCameraTraps/_test_dataset/R3_Kinkazan_REST_Boar_Samples
 image_list_file_path:
 output_dir:
 
 mdet_config:
   model_path: "./models/md_v4.1.0.pb"
   output_absolute_path: False
-  threshold: 0.1
-  ncores: 8
+  threshold: 0.95
   verbose: True
   recursive: True
+
+mdet_crop_config:
+  threshold: 0.95
+
+clip_config:
+  start_frame: 0
+  end_frame:
+  step: 30
+  ext: jpg
+  remove_banner: True

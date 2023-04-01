@@ -5,7 +5,10 @@ from typing import Union
 
 from omegaconf import OmegaConf
 
-from src.run_megadetector import run_detector
+from src.run_clip import clip
+from src.run_cls import classifire_predict
+from src.run_megadetector import run_mdet_crop, run_megadetector
+from src.run_summary import img_cls_summary, video_cls_summary
 from src.utils.config import (
     ClipConfig,
     ClsConfig,
@@ -13,6 +16,7 @@ from src.utils.config import (
     MDetCropConfig,
     MDetRenderConfig,
     RootConfig,
+    SummaryConfig,
 )
 from src.utils.logger import get_logger
 from src.utils.tag import SessionTag, session_tag_list
@@ -23,15 +27,25 @@ class Runner:
     def __init__(
         self,
         config: RootConfig,
-        session_tag: Union[SessionTag, list[SessionTag]],
+        session_tag: Union[SessionTag, list[SessionTag], str, list[str]],
     ) -> None:
         self.__check_config(config)
-        self.session_tags: list[SessionTag] = (
-            session_tag if isinstance(session_tag, list) else [session_tag]
-        )
+        if isinstance(session_tag, (str, list)):
+            self.session_tags: list[SessionTag] = (
+                [SessionTag.value_of(tag) for tag in session_tag]
+                if isinstance(session_tag, list)
+                else [SessionTag.value_of(session_tag)]
+            )
+        else:
+            self.session_tags: list[SessionTag] = (
+                session_tag if isinstance(session_tag, list) else [session_tag]
+            )
 
+        _session_tags_str = "-".join(
+            [session_tag.name for session_tag in self.session_tags]
+        )
         self.logdir = config.log_dir.joinpath(
-            f'{time.strftime("%Y%m%d%H%M%S")}_{"-".join([session_tag.name for session_tag in self.session_tags])}_{config.session_root.name}'
+            f'{time.strftime("%Y%m%d%H%M%S")}_{_session_tags_str}_{config.session_root.name}'
         )
         os.makedirs(self.logdir, exist_ok=True)
         self.logger = get_logger(out_dir=self.logdir, logname=f"{session_tag}.log")
@@ -47,7 +61,7 @@ class Runner:
         ).joinpath("detector_output.json")
         self.logger.info(f"Start {config.image_source} MegaDetector Detection...")
         self.logger.info(f"Output file: {output_file_path}")
-        run_detector(detector_config=config)
+        run_megadetector(detector_config=config)
         self.logger.info("Detection Complete")
         shutil.copyfile(
             str(output_file_path), str(self.logdir.joinpath(output_file_path.name))
@@ -58,16 +72,75 @@ class Runner:
             )
 
     def exec_mdet_crop(self, config: MDetCropConfig) -> None:
-        pass
+        self.logger.info(f"Start {config.image_source} MegaDetector Cropping...")
+        self.logger.info(f"MDet Output file: {config.mdet_result_path}")
+        self.logger.info(f"Output file: {config.output_dir}")
+        if config.mdet_result_path is None:
+            raise ValueError(
+                f"Invalid Value of mdet_result_path: {config.mdet_result_path}. Please enter."
+            )
+        if config.output_dir is None:
+            raise ValueError(
+                f"Invalid Value of output_dir: {config.output_dir}. Please enter."
+            )
+        run_mdet_crop(config=config)
+        self.logger.info("MDet cropping Complete!")
 
     def exec_mdet_render(self, config: MDetRenderConfig) -> None:
         pass
 
     def exec_clip(self, config: ClipConfig) -> None:
-        pass
+        self.logger.info(f"Start {config.video_dir.name} Clopping...")
+        self.logger.info(f"Save Dir: {config.output_dir}")
+        _end_frame = config.end_frame if config.end_frame is not None else "end"
+        self.logger.info(f"Frame: {config.start_frame}-{_end_frame}")
+        self.logger.info(f"Remove Banner: {config.remove_banner}")
+        with Timer(verbose=True, logger=self.logger, timer_tag="Clip"):
+            clip(config)
+        self.logger.info("Clip Complete!")
 
     def exec_cls(self, config: ClsConfig) -> None:
-        pass
+        input_file_path = config.image_source if config.image_source.is_file() else None
+        self.logger.info(f"Start {config.image_source} Classifire Prediction...")
+        classifire_predict(cls_config=config)
+        self.logger.info(f"Result file: {config.result_file_name}")
+        if input_file_path is not None:
+            shutil.copyfile(
+                str(input_file_path.parent.joinpath(config.result_file_name)),
+                str(self.logdir.joinpath(config.result_file_name)),
+            )
+            shutil.copyfile(
+                str(input_file_path), str(self.logdir.joinpath(input_file_path.name))
+            )
+        else:
+            shutil.copyfile(
+                str(config.image_source.joinpath(config.result_file_name)),
+                str(self.logdir.joinpath(config.result_file_name)),
+            )
+        self.logger.info("Prediction Complete!")
+
+    def exec_img_summary(self, config: SummaryConfig) -> None:
+        self.logger.info(f"Start {config.cls_result_dir} Classifire Summarize...")
+        # self.logger.info(f"Summarized file: {config.img_summary_name}")
+        result_path = img_cls_summary(config=config)
+        self.logger.info(f"Result file: {result_path}")
+        shutil.copyfile(
+            str(result_path),
+            str(self.logdir.joinpath(result_path.name)),
+        )
+        shutil.copyfile(
+            str(config.cls_result_dir.joinpath(config.img_summary_name)),
+            str(self.logdir.joinpath(config.img_summary_name)),
+        )
+        self.logger.info("IMG wise Summary Complete!")
+        if config.is_video_summary:
+            sequence_result_path = video_cls_summary(config=config)
+            self.logger.info(f"Sequence Result file: {sequence_result_path}")
+            shutil.copyfile(
+                str(sequence_result_path),
+                str(self.logdir.joinpath(sequence_result_path.name)),
+            )
+            self.logger.info("MOVIE wise Summary Complete!")
 
     def __check_config(self, config: RootConfig) -> None:
         assert (
@@ -76,9 +149,11 @@ class Runner:
         assert os.access(
             str(config.session_root), os.R_OK
         ), f"{config.session_root} does not Readable. Please enter the path where it readable"
-        assert os.access(
-            str(config.session_root), os.W_OK
-        ), f"{config.session_root} does not Writable. Please enter the path where it writable"
+        if config.output_dir is not None:
+            os.makedirs(config.output_dir, exist_ok=True)
+            assert os.access(
+                str(config.output_dir), os.W_OK
+            ), f"{config.output_dir} does not Writable. Please enter the path where it writable"
         assert (
             config.session_root.is_absolute()
         ), f"{config.session_root} does not Absolute Path. Please enter the absolute path"
@@ -101,6 +176,7 @@ class Runner:
         config: RootConfig,
         session_tag: SessionTag,
     ) -> None:
+        self.logger.info(session_tag)
         if session_tag == SessionTag.MDet:
             if config.mdet_config is not None:
                 self.exec_mdet(config=config.mdet_config)
@@ -116,6 +192,9 @@ class Runner:
         elif session_tag == SessionTag.Cls:
             if config.cls_config is not None:
                 self.exec_cls(config=config.cls_config)
+        elif session_tag == SessionTag.ImgSummary:
+            if config.summary_config is not None:
+                self.exec_img_summary(config=config.summary_config)
 
     def execute(self) -> None:
         exec_list = {k: False for k in session_tag_list}
