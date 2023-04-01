@@ -2,13 +2,13 @@
 
 ## What's this：このプログラムについて
 
-The purpose of this program is to detect wildlife from camera trap footage using [MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps) and to use a different classification model (resnet50) trained with wildlife images taken in Japan to identify the detected animals to species. This document is minimally descriptive at this time and will be updated as needed.  
+This program aims to detect wildlife from camera trap images/videos using [MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps) and to use another classification model (resnet50) trained with wildlife images taken in Japan to classify the detected animals into species. This document is a minimal description and will be updated as needed.  
 このプログラムは、[MegaDetector (Beery et al. 2019)](https://github.com/microsoft/CameraTraps)を利用してカメラトラップ映像から野生動物を検出し、検出された動物を日本国内で取得された野生動物画像で学習を行った別の分類モデル（resnet50）で種判別することを目的として作成されました。このドキュメントは現時点では最低限の記述しかされていないため、今後随時更新していく予定です。
 
-A program on learning species classification models will also be available on github at a later date (under construction). Note that the species classification model at this time uses the same dataset used in [Ando et al. (2019, in Japanese)](https://doi.org/10.11238/mammalianscience.59.49), so the number of images per animal species is unbalanced.  
+A program of learning species classification models will also be available on github at a later date (under construction). Note that the species classification model at this time uses the same dataset used in [Ando et al. (2019, in Japanese)](https://doi.org/10.11238/mammalianscience.59.49), so the number of images per animal species is unbalanced.  
 種判別モデル構築に関するプログラムも後日githubで公開予定です。なお、現時点における種判別モデルは、[安藤ら(2019)]( https://doi.org/10.11238/mammalianscience.59.49)で用いたものと同じデータセットを使っているため、動物種毎の画像数はアンバランスです。
 
-This program was supported by the Environment Research and Technology Development Fund (JPMEERF20204G01,[Reports in Japansese](https://sites.google.com/view/hyogowildlife/suishin4g2001)) of the Environmental Restoration and Conservation Agency, and is published according to MIT license.  
+This program was supported by the Environment Research and Technology Development Fund (JPMEERF20204G01,[Reports in Japanese](https://sites.google.com/view/hyogowildlife/suishin4g2001)) of the Environmental Restoration and Conservation Agency and is published according to MIT license.  
 このプログラムは環境省の環境研究総合推進費（4G-2001 イノシシの個体数密度およびCSF感染状況の簡易モニタリング手法の開発：[報告集](https://sites.google.com/view/hyogowildlife/suishin4g2001)）を受けて作成されたものであり、MITライセンスにしたがって公開されています。  
 
 ---
@@ -169,22 +169,28 @@ This program was supported by the Environment Research and Technology Developmen
     python exec_clip.py session_root=${video_dir} output_dir=${video_dir}-clip
     ```
 
+    A ```${video_dir}-clip``` directory with a similar hierarchical structure is generated in the same directory as ```${video_dir}```, and a directory containing clipped images is saved where the video was.  
+    ```${video_dir}```と同じディレクトリに同様の階層構造をもつ```${video_dir}-clip```ディレクトリが作成され、動画のあった位置には静止画を収めたディレクトリが作成されます。
+
 * Run MegaDetector  
   MegaDetectorの実行
 
     ```bash
     python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v4.1.0.pb
+    ```  
 
-    # For MegaDetector v5.0,
-    # python exec_mdet.py session_root=${video_dir}-clip mdet_config.model_path=./models/md_v5a.0.0.pt
-    ```
-
+    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
+    ```${video_dir}-clip```ディレクトリ内にMegaDetectorの結果(```detector_output.json```)が出力されます。
+    
 * Bounding Box Crop  
   バウンディングボックスで動物の領域を切り出し
 
     ```bash
     python exec_mdetcrop.py session_root=${video_dir}-clip mdet_result_path=${video_dir}-clip/detector_output.json
     ```
+
+    Where the same directory as ```${video_dir}-clip```, a ```${video_dir}-clip-crop``` directory containing clopped images is generated with a similar hierarchical structure.  
+    ```${video_dir}-clip```と同じディレクトリに同様の階層構造をもつ```${video_dir}-clip-crop```ディレクトリが作成され、静止画のあった位置には切り出された画像が保存されます。
 
 * Classification  
   切り出された画像の種分類
@@ -193,12 +199,18 @@ This program was supported by the Environment Research and Technology Developmen
     python exec_cls.py session_root=${video_dir}-clip-crop
     ```
 
+    The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
+    ```${video_dir}-clip-crop```ディレクトリ内にclassificationの結果(```classifire_prediction_result.csv```)が出力されます。    
+
 * Summarize  
   結果の要約
 
     ```bash
     python exec_imgsummary.py session_root=${video_dir}-clip-crop mdet_result_path=${video_dir}-clip/detector_output.json
     ```
+
+    A summary of the results per image (```img_wise_cls_summary.csv```) is output in the ```${video_dir}-clip-crop``` directory, and a summary of the results per video (```sequence_summary.csv```) in the ```${video_dir}-clip``` directory.
+    静止画単位の結果のサマリーが（```img_wise_cls_summary.csv```）が```${video_dir}-clip-crop```ディレクトリ内に、動画単位の結果のサマリーが(```sequence_summary.csv```)が```${video_dir}-clip```ディレクトリ内に、それぞれ出力されます。
 
 ### Parameter：各種パラメーター（整備中）
 
