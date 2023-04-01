@@ -13,8 +13,6 @@ This program was supported by the Environment Research and Technology Developmen
 
 ---
 
-
-
 ## Get Started：はじめに
 
 <br />
@@ -27,8 +25,7 @@ This program was supported by the Environment Research and Technology Developmen
     以下のコードはUbuntu 20.04LTS(x86-64)で動作確認しています。  
     動作確認時、動画ファイル形式は.mp4、静止画ファイル形式は.jpgを用いました。
 
-
-*  NVIDIA Driver
+* NVIDIA Driver
 
     ```bash
     sudo apt install nvidia-driver-***
@@ -37,7 +34,6 @@ This program was supported by the Environment Research and Technology Developmen
     Please refer to [NVIDIA Driver Version Check](https://www.nvidia.com/Download/index.aspx?lang=en-us).
     *** is a placeholder. Please enter the recommended nvidia driver version.  
     [NVIDIAドライババージョンチェック](https://www.nvidia.com/Download/index.aspx?lang=en-us)を参照し、***に推奨されるnvidiaドライババージョンを入力した上で実行してください。  
-
 
     Check installation.  
     インストール状況の確認。
@@ -96,9 +92,7 @@ This program was supported by the Environment Research and Technology Developmen
     conda activate mdet
     ```
 
-    #### Requirement
     必要なpythonパッケージは以下のとおり。
-
     * python=3.9
     * pytorch-gpu==1.10.1
     * torchvision==0.11.2
@@ -130,8 +124,6 @@ This program was supported by the Environment Research and Technology Developmen
     bash download_resnet50_model.sh
     ```
 
-
-
 ---
 
 ## Usage：使い方
@@ -139,7 +131,7 @@ This program was supported by the Environment Research and Technology Developmen
 <br />
 
 1. Download sample data：サンプルデータのダウンロード
-   
+
     ```bash
     bash download_sample_data.sh
     ```
@@ -147,16 +139,18 @@ This program was supported by the Environment Research and Technology Developmen
     Note: The sample data is extracted in the directory where `download_sample_data.sh` was executed. The following scripts are are assumed that the data is saved in `/home/${USER}/MDetToolsForJCameraTraps/`.  
     注意：サンプルデータはコードが実行されたディレクトリに保存されます。このページでは `/home/${USER}/MDetToolsForJCameraTraps/` に解凍された前提で以降のスクリプトを記載しています。
 
-2. Run Scripts with sample data：サンプルデータに対するスクリプト実行例    
+2. Run Scripts with sample data：サンプルデータに対するスクリプト実行例  
     Note:For the time being, only an example of execution using a video file (.mp4) is described.  
     注意：現時点では動画ファイル（.mp4）を用いた実行例のみ記載しています。
 
-   
 * Set environment variables for input/output directory  
   入出力ディレクトリに関する環境変数の設定
 
    ```bash
    video_dir=/home/${USER}/MDetToolsForJCameraTraps/sample_data/sample_session_v
+
+    # or
+    # video_dir=/home/${USER}/MDetToolsForJCameraTraps-main/sample_data/sample_session_v
    ```
 
     Note: The environment variable `${video_dir}` is used this sample code to keep the scripts short, but you can set any input/output directory for such as “session_root”, “output_dir”, and so on. When the output of the previous process is used in a subsequent process, the appropriate file path for the previous output must be specified. Also, the output directory must be writable.  
@@ -181,7 +175,7 @@ This program was supported by the Environment Research and Technology Developmen
 
     The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
     ```${video_dir}-clip```ディレクトリ内にMegaDetectorの結果(```detector_output.json```)が出力されます。
-    
+
 * Bounding Box Crop  
   バウンディングボックスで動物の領域を切り出し
 
@@ -200,7 +194,7 @@ This program was supported by the Environment Research and Technology Developmen
     ```
 
     The results of MegaDetector (```detector_output.json```) is output in the ```${video_dir}-clip``` directory.
-    ```${video_dir}-clip-crop```ディレクトリ内にclassificationの結果(```classifire_prediction_result.csv```)が出力されます。    
+    ```${video_dir}-clip-crop```ディレクトリ内にclassificationの結果(```classifire_prediction_result.csv```)が出力されます。  
 
 * Summarize  
   結果の要約
@@ -276,7 +270,6 @@ python exec_cls.py session_root=??? cls_config.model_path=models/classifire/15ca
 | cls_config.use_gpu | (optional) | bool | ~~~ |
 | cls_config.is_all_category_probs_output | (optional) | bool | ~~~ |
 
-
 exec_imgsummary.py
 
 ```bash
@@ -309,6 +302,7 @@ We recommend a GPU with at least 8GB of VRAM。
 以上の結果から、8GB以上のVRAMを搭載したGPUを推奨します。
 
 ---
+
 ## Directory Tree：フォルダ構造
 
 ```binary
@@ -349,4 +343,5 @@ We recommend a GPU with at least 8GB of VRAM。
 ├── exec_mdetcrop.py
 └── exec_sample.sh
 ```
+
 The scripts of src/megadetector is from [microsoft/CameraTraps](https://github.com/microsoft/CameraTraps) [commits on Oct 12, 2022](https://github.com/microsoft/CameraTraps/commit/33d1d9fa383e0935e8115b325e538811bd92b65f)
